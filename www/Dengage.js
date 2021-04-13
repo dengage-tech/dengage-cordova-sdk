@@ -1,9 +1,10 @@
 var exec = require('cordova/exec');
 
 var Dengage = {
-    coolMethod: function (arg0, success, error) {
-        exec(success, error, 'Dengage', 'coolMethod', [arg0]);
-    }
+    setupDengage: function (logStatus, firebaseKey, huaweiKey, success, error) {
+        exec(success, error, 'Dengage', 'setupDengage', [logStatus, firebaseKey, huaweiKey]);
+    },
+
 };
 
 module.exports = Dengage
