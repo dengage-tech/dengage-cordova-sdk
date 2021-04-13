@@ -1,0 +1,27 @@
+{
+  "name": "cordova-plugin-dengage",
+  "version": "0.0.1",
+  "description": "**D·engage Customer Driven Marketing Platform (CDMP)** serves as a customer data platform (CDP) with built-in omnichannel marketing features. It replaces your marketing automation and cross-channel campaign management. For further details about D·engage please [visit here](https://dev.dengage.com).",
+  "cordova": {
+    "id": "cordova-plugin-dengage",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dengage-tech/dengage-cordova-sdk.git"
+  },
+  "keywords": [
+    "dengage",
+    "cordova-dengage",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dengage-tech/dengage-cordova-sdk/issues"
+  },
+  "homepage": "https://github.com/dengage-tech/dengage-cordova-sdk#readme"
+}

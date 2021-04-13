@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-dengage" version="1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>Dengage</name>
+    <keywords>dengage,cordova-dengage</keywords>
+    <repo>https://github.com/dengage-tech/dengage-cordova-sdk</repo>
+    <issue>https://github.com/dengage-tech/dengage-cordova-sdk/issues</issue>
+    <js-module name="Dengage" src="www/Dengage.js">
+        <clobbers target="Dengage"/>
+    </js-module>
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="Dengage">
+                <param name="android-package" value="Dengage"/>
+                <param name="onload" value="true"/>
+            </feature>
+            <preference name="AndroidXEnabled" value="true" />
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml"></config-file>
+        <source-file src="src/android/Dengage.java" target-dir="src/Dengage"/>
+
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+
+    </platform>
+</plugin>

@@ -1,0 +1,14 @@
+allprojects {
+    repositories {
+         mavenCentral()
+         jcenter()
+         google()
+         maven { url "https://jitpack.io" }
+         maven { url 'http://developer.huawei.com/repo/' }
+    }
+}
+
+dependencies {
+      implementation 'com.github.whitehorse-technology:dengage.android.sdk:feature~in-app-message-SNAPSHOT'
+      implementation 'com.huawei.hms:ads-identifier:3.4.28.313'
+}
