@@ -37,7 +37,40 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("setContactKey")) {
+            String contactKey = args.getString(0);
+            this.setContactKey(contactKey, callbackContext);
+            return true;
+        }
 
+        if (action.equals("setLogStatus")) {
+            boolean logStatus = Boolean.parseBoolean(args.getString(0));
+            this.setContactKey(logStatus, callbackContext);
+            return true;
+        }
+
+        if (action.equals("setPermission")) {
+            boolean permission = Boolean.parseBoolean(args.getString(0));
+            this.setContactKey(permission, callbackContext);
+            return true;
+        }
+
+        if (action.equals("setHuaweiIntegrationKey")) {
+            String key = args.getString(0);
+            this.setHuaweiIntegrationKey(permission, callbackContext);
+            return true;
+        }
+
+        if (action.equals("setFirebaseIntegrationKey")) {
+            String key = args.getString(0);
+            this.setFirebaseIntegrationKey(key, callbackContext);
+            return true;
+        }
+
+        if (action.equals("getMobilePushToken")) {
+            this.getMobilePushToken(callbackContext);
+            return true;
+        }
 
         return false;
     }
@@ -71,5 +104,64 @@ public class Dengage extends CordovaPlugin {
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }
+    }
+
+    private void setContactKey(String contactKey, CallbackContext callbackContext) {
+        try {
+            this.manager.setContactKey(contactKey);
+            callbackContext.success("Setting Contact Key Successfully");
+        }  catch (Exception e) {
+           callbackContext.error(e.getMessage());
+         }
+    }
+
+    private void setLogStatus(boolean logStatus, CallbackContext callbackContext) {
+        try {
+            this.manager.setLogStatus(logStatus);
+            callbackContext.success("Set Log Status " + logStatus);
+        }  catch (Exception e) {
+           callbackContext.error(e.getMessage());
+         }
+    }
+
+    private void setPermission(boolean permission, CallbackContext callbackContext) {
+        try {
+            this.manager.setPermission(permission);
+            callbackContext.success("Set Log Status " + logStatus);
+        }  catch (Exception e) {
+           callbackContext.error(e.getMessage());
+         }
+    }
+
+    private void setFirebaseIntegrationKey(String key, CallbackContext callbackContext) {
+            try {
+                this.manager.setFirebaseIntegrationKey(key);
+                callbackContext.success("Setting Firebase Integration Key " + token);
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
+    }
+
+    private void setHuaweiIntegrationKey(String key, CallbackContext callbackContext) {
+            try {
+                this.manager.setHuaweiIntegrationKey(key);
+                callbackContext.success("Setting Huawei Integration Key " + token);
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
+    }
+
+    private void getMobilePushToken(CallbackContext callbackContext) {
+            try {
+                const token = this.manager.getSubscription().token;
+                if (token) {
+                    callbackContext.success(token);
+                    return;
+                }
+
+                throw Exception("unable to get token.");
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
     }
 }
