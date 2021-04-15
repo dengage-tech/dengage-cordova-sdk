@@ -45,19 +45,19 @@ public class Dengage extends CordovaPlugin {
 
         if (action.equals("setLogStatus")) {
             boolean logStatus = Boolean.parseBoolean(args.getString(0));
-            this.setContactKey(logStatus, callbackContext);
+            this.setLogStatus(logStatus, callbackContext);
             return true;
         }
 
         if (action.equals("setPermission")) {
             boolean permission = Boolean.parseBoolean(args.getString(0));
-            this.setContactKey(permission, callbackContext);
+            this.setPermission(permission, callbackContext);
             return true;
         }
 
         if (action.equals("setHuaweiIntegrationKey")) {
             String key = args.getString(0);
-            this.setHuaweiIntegrationKey(permission, callbackContext);
+            this.setHuaweiIntegrationKey(key, callbackContext);
             return true;
         }
 
@@ -69,6 +69,16 @@ public class Dengage extends CordovaPlugin {
 
         if (action.equals("getMobilePushToken")) {
             this.getMobilePushToken(callbackContext);
+            return true;
+        }
+
+        if (action.equals("getContactKey")) {
+            this.getContactKey(callbackContext);
+            return true;
+        }
+
+        if (action.equals("getUserPermission")) {
+            this.getPermission(callbackContext);
             return true;
         }
 
@@ -100,7 +110,7 @@ public class Dengage extends CordovaPlugin {
                     .init();
             }
 
-            callbackContext.success("Dengage Setup Successfully");
+            callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }
@@ -109,7 +119,7 @@ public class Dengage extends CordovaPlugin {
     private void setContactKey(String contactKey, CallbackContext callbackContext) {
         try {
             this.manager.setContactKey(contactKey);
-            callbackContext.success("Setting Contact Key Successfully");
+            callbackContext.success(contactKey);
         }  catch (Exception e) {
            callbackContext.error(e.getMessage());
          }
@@ -118,7 +128,7 @@ public class Dengage extends CordovaPlugin {
     private void setLogStatus(boolean logStatus, CallbackContext callbackContext) {
         try {
             this.manager.setLogStatus(logStatus);
-            callbackContext.success("Set Log Status " + logStatus);
+            callbackContext.success();
         }  catch (Exception e) {
            callbackContext.error(e.getMessage());
          }
@@ -127,7 +137,7 @@ public class Dengage extends CordovaPlugin {
     private void setPermission(boolean permission, CallbackContext callbackContext) {
         try {
             this.manager.setPermission(permission);
-            callbackContext.success("Set Log Status " + logStatus);
+            callbackContext.success();
         }  catch (Exception e) {
            callbackContext.error(e.getMessage());
          }
@@ -136,7 +146,7 @@ public class Dengage extends CordovaPlugin {
     private void setFirebaseIntegrationKey(String key, CallbackContext callbackContext) {
             try {
                 this.manager.setFirebaseIntegrationKey(key);
-                callbackContext.success("Setting Firebase Integration Key " + token);
+                callbackContext.success(key);
             }  catch (Exception e) {
                callbackContext.error(e.getMessage());
              }
@@ -145,7 +155,7 @@ public class Dengage extends CordovaPlugin {
     private void setHuaweiIntegrationKey(String key, CallbackContext callbackContext) {
             try {
                 this.manager.setHuaweiIntegrationKey(key);
-                callbackContext.success("Setting Huawei Integration Key " + token);
+                callbackContext.success(key);
             }  catch (Exception e) {
                callbackContext.error(e.getMessage());
              }
@@ -153,13 +163,31 @@ public class Dengage extends CordovaPlugin {
 
     private void getMobilePushToken(CallbackContext callbackContext) {
             try {
-                const token = this.manager.getSubscription().token;
-                if (token) {
+                String token = this.manager.getSubscription().getToken();
+                if (token != null && token.length() != 0) {
                     callbackContext.success(token);
                     return;
                 }
 
-                throw Exception("unable to get token.");
+                callbackContext.error("unable to get token.");
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
+    }
+
+    private void getContactKey(CallbackContext callbackContext) {
+            try {
+                String key = this.manager.getSubscription().getContactKey();
+                callbackContext.success(key);
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
+    }
+
+    private void getPermission(CallbackContext callbackContext) {
+            try {
+                boolean permission = this.manager.getSubscription().getPermission();
+                callbackContext.success();
             }  catch (Exception e) {
                callbackContext.error(e.getMessage());
              }
