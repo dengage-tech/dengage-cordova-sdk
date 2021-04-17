@@ -87,17 +87,17 @@ public class Dengage extends CordovaPlugin {
 
     private void setupDengage(boolean logStatus, String firebaseKey, String huaweiKey, CallbackContext callbackContext) {
         try {
-            if (firebaseKey == null && huaweiKey == null) {
+            if (this.isEmptyOrNull(firebaseKey) && this.isEmptyOrNull(huaweiKey)) {
                 callbackContext.error("Both firebase key and huawei key can't be null at the same time.");
                 return;
             }
 
-            if (firebaseKey != null) {
+            if (!this.isEmptyOrNull(firebaseKey)) {
                  this.manager
                     .setLogStatus(logStatus)
                     .setFirebaseIntegrationKey(firebaseKey)
                     .init();
-            } else if (huaweiKey != null) {
+            } else if (!this.isEmptyOrNull(huaweiKey)) {
                 this.manager
                     .setLogStatus(logStatus)
                     .setHuaweiIntegrationKey(huaweiKey)
@@ -164,7 +164,7 @@ public class Dengage extends CordovaPlugin {
     private void getMobilePushToken(CallbackContext callbackContext) {
             try {
                 String token = this.manager.getSubscription().getToken();
-                if (token != null && token.length() != 0) {
+                if (!this.isEmptyOrNull(token)) {
                     callbackContext.success(token);
                     return;
                 }
@@ -191,5 +191,17 @@ public class Dengage extends CordovaPlugin {
             }  catch (Exception e) {
                callbackContext.error(e.getMessage());
              }
+    }
+
+    private boolean isEmptyOrNull (String value) {
+        if (value == null || value == "null" )  {
+               return true;
+        }
+
+        if (value.length() == 0 || value.trim().length() == 0) {
+            return true;
+        }
+
+        return false;
     }
 }

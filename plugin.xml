@@ -20,6 +20,8 @@
         <source-file src="src/android/Dengage.java" target-dir="src/Dengage"/>
 
         <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-
+        <framework src="com.google.firebase:firebase-core:18.0.2" />
+        <framework src="com.google.firebase:firebase-messaging:21.0.1" />
+        <framework src="com.google.firebase:firebase-analytics:18.0.2" />
     </platform>
 </plugin>
