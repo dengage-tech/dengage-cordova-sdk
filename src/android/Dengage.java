@@ -67,6 +67,12 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("setMobilePushToken")) {
+            String token = args.getString(0);
+            this.setMobilePushToken(token, callbackContext);
+            return true;
+        }
+
         if (action.equals("getMobilePushToken")) {
             this.getMobilePushToken(callbackContext);
             return true;
@@ -175,10 +181,33 @@ public class Dengage extends CordovaPlugin {
              }
     }
 
+    private void setMobilePushToken(String token, CallbackContext callbackContext) {
+            try {
+                if (this.isEmptyOrNull(token)) {
+                   callbackContext.error("Token is required");
+                   return;
+                }
+
+                this.manager.getSubscription().setToken(token);
+                callbackContext.success(token);
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
+    }
+
     private void getContactKey(CallbackContext callbackContext) {
             try {
                 String key = this.manager.getSubscription().getContactKey();
                 callbackContext.success(key);
+            }  catch (Exception e) {
+               callbackContext.error(e.getMessage());
+             }
+    }
+
+    private void getPermission(CallbackContext callbackContext) {
+            try {
+                boolean permission = this.manager.getSubscription().getPermission();
+                callbackContext.success();
             }  catch (Exception e) {
                callbackContext.error(e.getMessage());
              }

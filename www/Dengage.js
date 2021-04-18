@@ -19,12 +19,18 @@ var Dengage = {
     setPermission: function (permission, success, error) {
         exec(success, error, 'Dengage', 'setPermission', [permission])
     },
+    setMobilePushToken: function (token, success, error) {
+        exec(success, error, 'Dengage', 'getMobilePushToken', [token])
+    },
     getMobilePushToken: function (success, error) {
         exec(success, error, 'Dengage', 'getMobilePushToken', [])
     },
     getContactKey: function (success, error) {
         exec(success, error, 'Dengage', 'getContactKey', [])
-    }
+    },
+    getPermission: function (success, error) {
+        exec(success, error, 'Dengage', 'getPermission', [])
+    },
 };
 
 module.exports = Dengage
