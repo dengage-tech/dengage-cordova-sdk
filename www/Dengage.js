@@ -24,10 +24,7 @@ var Dengage = {
     },
     getContactKey: function (success, error) {
         exec(success, error, 'Dengage', 'getContactKey', [])
-    },
-    getPermission: function (success, error) {
-        exec(success, error, 'Dengage', 'getPermission', [])
-    },
+    }
 };
 
 module.exports = Dengage

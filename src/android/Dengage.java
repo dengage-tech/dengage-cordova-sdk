@@ -184,15 +184,6 @@ public class Dengage extends CordovaPlugin {
              }
     }
 
-    private void getPermission(CallbackContext callbackContext) {
-            try {
-                boolean permission = this.manager.getSubscription().getPermission();
-                callbackContext.success();
-            }  catch (Exception e) {
-               callbackContext.error(e.getMessage());
-             }
-    }
-
     private boolean isEmptyOrNull (String value) {
         if (value == null || value == "null" )  {
                return true;
