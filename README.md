@@ -86,6 +86,7 @@ Note: Please see API Endpoints By Datacenter to set your event end point.
 Following is the sample code as an example for `Subscription/Event Api Endpoint`
 
 ```xml
+
 <config-file parent="./application" target="AndroidManifest.xml">
     <meta-data
             android:name="den_event_api_url"
@@ -95,6 +96,7 @@ Following is the sample code as an example for `Subscription/Event Api Endpoint`
             android:value="https://push.dengage.com"/>
 </config-file>
 ```
+
 </details>
 
 ## Supported Versions
@@ -139,14 +141,17 @@ and call dengage function as follows:
 
 ```Javascript
 promisify(Dengage.setupDengage)(true, null, null)
-.then(() => 'Successfully Setup Dengage Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Setup Dengage Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
 ### Subscription
-****Subscription is a process which is triggered by sending subscription event to D·engage. It contains necessary informations about application to send push notifications to clients.****
 
-Subscriptions are self managed by D·engage SDK and subcription cycle starts with Prompting user permission. SDK will automaticlly send subscription events under following circumstances:
+****Subscription is a process which is triggered by sending subscription event to D·engage. It contains necessary
+informations about application to send push notifications to clients.****
+
+Subscriptions are self managed by D·engage SDK and subcription cycle starts with Prompting user permission. SDK will
+automaticlly send subscription events under following circumstances:
 
 - Initialization
 - Setting Contact key
@@ -154,77 +159,98 @@ Subscriptions are self managed by D·engage SDK and subcription cycle starts wit
 - Setting User Permission (if you have manual management of permission)
 
 ### Asking User Permission for Notification
+
 > Note: Android doesn't require to ask for push notifications explicitly. Therefore, you can only ask for push notification's permissions on iOS.
 
-IOS uses shared `UNUserNotificationCenter` by itself while asking user to send notification. D·engage SDK manager uses `UNUserNotificationCenter` to ask permission as well. [Apple Doc Reference](https://developer.apple.com/documentation/usernotifications/asking_permission_to_use_notifications)
+IOS uses shared `UNUserNotificationCenter` by itself while asking user to send notification. D·engage SDK manager
+uses `UNUserNotificationCenter` to ask permission as
+well. [Apple Doc Reference](https://developer.apple.com/documentation/usernotifications/asking_permission_to_use_notifications)
 
-If in your application, you want to get UserNotification permissions explicitly, you can do by calling one of the following methods:
+If in your application, you want to get UserNotification permissions explicitly, you can do by calling one of the
+following methods:
 
 ```Javascript
 // will update docs when starting on cordova dengage sdk for ios
 ```
 
 ### Setting Contact Key
-***Contact Key represents user id in your system. There are two types of devices. Anonymous Devices and Contact Devices. Contact Devices contains Contact Key.***
+
+***Contact Key represents user id in your system. There are two types of devices. Anonymous Devices and Contact Devices.
+Contact Devices contains Contact Key.***
 
 To track devices by their contacts you need to set contact key on SDK.
 
 > Note: It is recommended to call this method, if you have user information. You should call in every app open and on login, logout pages.
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.setContactKey(contactKey, successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.setContactKey)(contactKey)
-.then(() => 'Successfully Setting Contact Key Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Setting Contact Key Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
 **Note: Promisify function is defined above in `Initial Setup Dengage`**
 
 ### Getting Contact Key
+
 This method is to get the current user information from SDK getContactKey method can be used.
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.getContactKey(successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.getContactKey)()
-.then(() => 'Successfully Getting Contact Key Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Getting Contact Key Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
 ### Manual Management of Tokens
-If you need to get current token or if you are managing token subscription process manually, you can use setToken and getToken functions.
+
+If you need to get current token or if you are managing token subscription process manually, you can use setToken and
+getToken functions.
 
 #### Get Push Token
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.getMobilePushToken(successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.getMobilePushToken)()
-.then(() => 'Successfully Getting Token Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Getting Token Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
-#### Set Push Token 
+#### Set Push Token
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.setMobilePushToken(successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.setMobilePushToken)(token)
-.then(() => 'Successfully Setting Token Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Setting Token Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
 ### Logging
@@ -234,41 +260,102 @@ SDK can provide logs for debuging. It displays queries and payloads which are se
 To validate your inputs you can enable SDK’s log by a method
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.setLogStatus(logStatus, successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.setLogStatus)(logStatus)
-.then(() => 'Successfully Setting Log Status Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Setting Log Status Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
 ### User Permission Management (optional)
-If you manage your own user permission states on your application you may send user permission by using setUserPermission method.
+
+If you manage your own user permission states on your application you may send user permission by using
+setUserPermission method.
 
 #### Set User Permission
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.setPermission(permission, successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.setPermission)(permission)
-.then(() => 'Successfully Setting Permission Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Setting Permission Code Here')
+    .catch((err) => 'Error Handling Here')
 ```
 
 #### Get User Permission
 
 - Using Callback Approach
+
 ```Javascript 
 Dengage.getPermission(successCallbackFunc, errorCallbackFunc)
 ```
+
 - Using Promise Approach
+
 ```Javascript
 promisify(Dengage.getPermission)
-.then(() => 'Successfully Getting Permission Code Here')
-.catch((err) => 'Error Handling Here')
+    .then(() => 'Successfully Getting Permission Code Here')
+    .catch((err) => 'Error Handling Here')
+```
+
+### Action Buttons
+
+Android SDK allows you to put clickable buttons under the notification.
+
+#### Requirements
+
+- Android SDK 2.0.0+
+
+Before you start, if you need to handle action buttons with yourself, then you need to set your receiver in
+androidmanifest.xml which extends from com.dengage.sdk.NotificationReceiver. Otherwise the SDK will handle button
+clicks.
+
+you need to define your receiver in your config.xml file.
+
+```xml
+
+<receiver android:name=".MyReceiver"
+          android:exported="false">
+    <intent-filter>
+        <action android:name="com.dengage.push.intent.RECEIVE"/>
+        <action android:name="com.dengage.push.intent.OPEN"/>
+        <action android:name="com.dengage.push.intent.DELETE"/>
+        <action android:name="com.dengage.push.intent.ACTION_CLICK"/>
+    </intent-filter>
+</receiver>
+```
+
+The SDK fires an event callback which is called onActionClick in your receiver class when an action button is clicked.
+So you can catch the button.
+
+```java
+public class MyReceiver extends NotificationReceiver {  
+    @Override  
+  protected void onActionClick(Context context, Intent intent) {  
+        Bundle extras = intent.getExtras();  
+        if(extras != null)  
+        {  
+             String actionId = extras.getString("id");  
+             int notificationId = extras.getInt("notificationId");  
+             String targetUrl = extras.getString("targetUrl");  
+  
+             Log.d("DenPush", actionId +" is clicked");  
+        }  
+  
+       // Remove if you prefer to handle targetUrl which is actually correspond a deeplink.  
+       super.onActionClick(context, intent);  
+  }  
+}
 ```
