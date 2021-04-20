@@ -83,7 +83,7 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
-        if (action.equals("getUserPermission")) {
+        if (action.equals("getPermission")) {
             this.getPermission(callbackContext);
             return true;
         }
@@ -207,7 +207,7 @@ public class Dengage extends CordovaPlugin {
     private void getPermission(CallbackContext callbackContext) {
             try {
                 boolean permission = this.manager.getSubscription().getPermission();
-                callbackContext.success();
+                callbackContext.success(Boolean.toString(permission));
             }  catch (Exception e) {
                callbackContext.error(e.getMessage());
              }

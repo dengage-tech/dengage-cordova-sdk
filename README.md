@@ -60,7 +60,7 @@ contains [steps mentioned here.](https://dev.dengage.com/mobile-sdk/android/huaw
 
 ### Change Subscription Api Endpoint
 
-You can change subscription api endpoint by adding following metadata tag in `YourProject/config.xml`
+You can change subscription api endpoint by adding following metadata tag in `AndroidManifest.xml`
 
   ```
   <meta-data
@@ -73,7 +73,7 @@ Note: Please see API Endpoints By Datacenter to set your subscription end point.
 ### Changing Event Api Endpoint
 
 similar to subscription endpoints, you can change event api endpoints by setting following metadata tag
-in `YourProject/config.xml`
+in `AndroidManifest.xml`
 
   ```
   <meta-data
@@ -322,7 +322,7 @@ Before you start, if you need to handle action buttons with yourself, then you n
 androidmanifest.xml which extends from com.dengage.sdk.NotificationReceiver. Otherwise the SDK will handle button
 clicks.
 
-you need to define your receiver in your config.xml file.
+you need to define your receiver in your `AndroidManifest.xml` file.
 
 ```xml
 
