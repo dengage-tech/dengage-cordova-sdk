@@ -31,6 +31,39 @@ var Dengage = {
     getPermission: function (success, error) {
         exec(success, error, 'Dengage', 'getPermission', [])
     },
+    getSubscription: function (success, error) {
+        exec(success, error, 'Dengage', 'getSubscription', [])
+    },
+    pageView: function (data, success, error) {
+        exec(success, error, 'Dengage', 'pageView', [data])
+    },
+    addToCart: function (data, success, error) {
+        exec(success, error, 'Dengage', 'addToCart', [data])
+    },
+    removeFromCart: function (data, success, error) {
+        exec(success, error, 'Dengage', 'removeFromCart', [data])
+    },
+    viewCart: function (data, success, error) {
+        exec(success, error, 'Dengage', 'viewCart', [data])
+    },
+    beginCheckout: function (data, success, error) {
+        exec(success, error, 'Dengage', 'beginCheckout', [data])
+    },
+    placeOrder: function (data, success, error) {
+        exec(success, error, 'Dengage', 'placeOrder', [data])
+    },
+    cancelOrder: function (data, success, error) {
+        exec(success, error, 'Dengage', 'cancelOrder', [data])
+    },
+    addToWishList: function (data, success, error) {
+        exec(success, error, 'Dengage', 'addToWishList', [data])
+    },
+    removeFromWishList: function (data, success, error) {
+        exec(success, error, 'Dengage', 'removeFromWishList', [data])
+    },
+    search: function (data, success, error) {
+        exec(success, error, 'Dengage', 'search', [data])
+    },
 };
 
 module.exports = Dengage
