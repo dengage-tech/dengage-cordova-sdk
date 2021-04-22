@@ -325,9 +325,9 @@ public class Dengage extends CordovaPlugin {
     private void removeFromCart(Object data, CallbackContext callbackContext) {
         try {
             ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.removeFromCart(data, Map.class);
+            Map<String, Object> map = oMapper.convertValue(data, Map.class);
 
-            DengageEvent.getInstance(this.context).addToCart(map);
+            DengageEvent.getInstance(this.context).removeFromCart(map);
 
             callbackContext.success();
         } catch (Exception e) {
