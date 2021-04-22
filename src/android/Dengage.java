@@ -1,23 +1,18 @@
-package Dengage;
-
 import android.content.Context;
 
-import com.dengage.sdk.DengageManager;
 import com.dengage.sdk.DengageEvent;
+import com.dengage.sdk.DengageManager;
+import com.google.gson.Gson;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
-
-import com.google.gson.*;
-
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This class Dengage functions called from JavaScript.
@@ -102,61 +97,62 @@ public class Dengage extends CordovaPlugin {
         }
 
         if (action.equals("pageView")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.pageView(data, callbackContext);
+
             return true;
         }
 
         if (action.equals("addToCart")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.addToCart(data, callbackContext);
             return true;
         }
 
         if (action.equals("removeFromCart")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.removeFromCart(data, callbackContext);
             return true;
         }
 
         if (action.equals("viewCart")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.viewCart(data, callbackContext);
             return true;
         }
 
         if (action.equals("beginCheckout")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.beginCheckout(data, callbackContext);
             return true;
         }
 
         if (action.equals("placeOrder")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.placeOrder(data, callbackContext);
             return true;
         }
 
         if (action.equals("cancelOrder")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.cancelOrder(data, callbackContext);
             return true;
         }
 
         if (action.equals("addToWishList")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.addToWishList(data, callbackContext);
             return true;
         }
 
         if (action.equals("removeFromWishList")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.removeFromWishList(data, callbackContext);
             return true;
         }
 
         if (action.equals("search")) {
-            Object data = args.get(0);
+            JSONObject data = new JSONObject(args.getString(0));
             this.search(data, callbackContext);
             return true;
         }
@@ -296,10 +292,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void pageView(Object data, CallbackContext callbackContext) {
+    private void pageView(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).pageView(map);
 
@@ -309,10 +304,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void addToCart(Object data, CallbackContext callbackContext) {
+    private void addToCart(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).addToCart(map);
 
@@ -322,10 +316,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void removeFromCart(Object data, CallbackContext callbackContext) {
+    private void removeFromCart(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).removeFromCart(map);
 
@@ -335,10 +328,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void viewCart(Object data, CallbackContext callbackContext) {
+    private void viewCart(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).viewCart(map);
 
@@ -348,10 +340,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void beginCheckout(Object data, CallbackContext callbackContext) {
+    private void beginCheckout(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).beginCheckout(map);
 
@@ -361,10 +352,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void placeOrder(Object data, CallbackContext callbackContext) {
+    private void placeOrder(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).order(map);
 
@@ -374,10 +364,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void cancelOrder(Object data, CallbackContext callbackContext) {
+    private void cancelOrder(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).cancelOrder(map);
 
@@ -387,10 +376,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void addToWishList(Object data, CallbackContext callbackContext) {
+    private void addToWishList(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).addToWishList(map);
 
@@ -400,10 +388,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void removeFromWishList(Object data, CallbackContext callbackContext) {
+    private void removeFromWishList(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).removeFromWishList(map);
 
@@ -413,10 +400,9 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void search(Object data, CallbackContext callbackContext) {
+    private void search(JSONObject data, CallbackContext callbackContext) {
         try {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(data, Map.class);
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).search(map);
 
