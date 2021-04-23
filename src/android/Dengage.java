@@ -2,12 +2,15 @@ import android.content.Context;
 
 import com.dengage.sdk.DengageEvent;
 import com.dengage.sdk.DengageManager;
+import com.dengage.sdk.callback.DengageCallback;
+import com.dengage.sdk.models.DengageError;
 import com.google.gson.Gson;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -161,6 +164,25 @@ public class Dengage extends CordovaPlugin {
             String tableName = args.getString(0);
             JSONObject data = new JSONObject(args.getString(1));
             this.sendDeviceEvent(tableName, data, callbackContext);
+            return true;
+        }
+
+        if (action.equals("getInboxMessages")) {
+            int offset = args.getInt(0);
+            int limit = args.getInt(1);
+            this.getInboxMessages(offset, limit, callbackContext);
+            return true;
+        }
+
+        if (action.equals("deleteInboxMessage")) {
+            String id = args.getString(0);
+            this.deleteInboxMessage(id, callbackContext);
+            return true;
+        }
+
+        if (action.equals("setInboxMessageAsClicked")) {
+            String id = args.getString(0);
+            this.setInboxMessageAsClicked(id, callbackContext);
             return true;
         }
 
@@ -426,6 +448,52 @@ public class Dengage extends CordovaPlugin {
             DengageEvent.getInstance(this.context).sendDeviceEvent(tableName, map);
 
             callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void getInboxMessages(int offset, int limit, CallbackContext callbackContext) {
+        try {
+            DengageCallback callback = new DengageCallback() {
+                @Override
+                public void onResult(Object result) {
+                    callbackContext.success(new Gson().toJson(result));
+                }
+
+                @Override
+                public void onError(@NotNull DengageError dengageError) {
+                    callbackContext.error(dengageError.getErrorMessage());
+                }
+            };
+
+            this.manager.getInboxMessages(offset, limit, callback);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void deleteInboxMessage(String id, CallbackContext callbackContext) {
+        try {
+            this.manager.deleteInboxMessage(id);
+            JSONObject obj = new JSONObject();
+            obj.put("success", true);
+            obj.put("id", id);
+
+            callbackContext.success(obj);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setInboxMessageAsClicked(String id, CallbackContext callbackContext) {
+        try {
+            this.manager.setInboxMessageAsClicked(id);
+            JSONObject obj = new JSONObject();
+            obj.put("success", true);
+            obj.put("id", id);
+
+            callbackContext.success(obj);
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }

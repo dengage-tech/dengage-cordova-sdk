@@ -67,6 +67,15 @@ var Dengage = {
     sendDeviceEvent: function (tableName, data, success, error) {
         exec(success, error, 'Dengage', 'sendDeviceEvent', [tableName, data])
     },
+    getInboxMessages: function (offset, limit, success, error) {
+        exec(success, error, 'Dengage', 'getInboxMessages', [offset, limit])
+    },
+    deleteInboxMessage: function (id, success, error) {
+        exec(success, error, 'Dengage', 'deleteInboxMessage', [id])
+    },
+    setInboxMessageAsClicked: function (id, success, error) {
+        exec(success, error, 'Dengage', 'setInboxMessageAsClicked', [id])
+    }
 };
 
 module.exports = Dengage
