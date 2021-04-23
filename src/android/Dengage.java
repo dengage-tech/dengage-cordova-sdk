@@ -157,6 +157,13 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("sendDeviceEvent")) {
+            String tableName = args.getString(0);
+            JSONObject data = new JSONObject(args.getString(1));
+            this.sendDeviceEvent(tableName, data, callbackContext);
+            return true;
+        }
+
         return false;
     }
 
@@ -405,6 +412,18 @@ public class Dengage extends CordovaPlugin {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
             DengageEvent.getInstance(this.context).search(map);
+
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void sendDeviceEvent(String tableName, JSONObject data, CallbackContext callbackContext) {
+        try {
+            HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
+
+            DengageEvent.getInstance(this.context).sendDeviceEvent(tableName, map);
 
             callbackContext.success();
         } catch (Exception e) {

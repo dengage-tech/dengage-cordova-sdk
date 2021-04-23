@@ -64,6 +64,9 @@ var Dengage = {
     search: function (data, success, error) {
         exec(success, error, 'Dengage', 'search', [data])
     },
+    sendDeviceEvent: function (tableName, data, success, error) {
+        exec(success, error, 'Dengage', 'sendDeviceEvent', [tableName, data])
+    },
 };
 
 module.exports = Dengage
