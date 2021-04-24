@@ -14,18 +14,38 @@
                 <param name="android-package" value="Dengage"/>
                 <param name="onload" value="true"/>
             </feature>
-            <preference name="AndroidXEnabled" value="true" />
+            <preference name="AndroidXEnabled" value="true"/>
         </config-file>
-        <config-file parent="/*" target="AndroidManifest.xml"></config-file>
+        <config-file parent="/*" target="AndroidManifest.xml"/>
         <source-file src="src/android/Dengage.java" target-dir="src/Dengage"/>
 
         <preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="21.0.1"/>
         <preference name="ANDROID_FIREBASE_CORE_VERSION" default="18.0.2"/>
         <preference name="ANDROID_FIREBASE_FIREBASE_ANALYTICS" default="18.0.2"/>
 
-        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-        <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION" />
-        <framework src="com.google.firebase:firebase-messaging:$ANDROID_FIREBASE_MESSAGING_VERSION" />
-        <framework src="com.google.firebase:firebase-analytics:$ANDROID_FIREBASE_FIREBASE_ANALYTICS" />
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference"/>
+        <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
+        <framework src="com.google.firebase:firebase-messaging:$ANDROID_FIREBASE_MESSAGING_VERSION"/>
+        <framework src="com.google.firebase:firebase-analytics:$ANDROID_FIREBASE_FIREBASE_ANALYTICS"/>
+    </platform>
+
+    <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+            <feature name="Dengage">
+                <param name="ios-package" value="Dengage"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <podspec>
+            <pods>
+                <pod name="Dengage.Framework" spec="~> 2.5"/>
+            </pods>
+        </podspec>
+
+
+        <source-file src="src/ios/Dengage.swift"/>
+        <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
+        <preference name="UseSwiftLanguageVersion" default="5" />
     </platform>
 </plugin>
