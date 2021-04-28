@@ -20,7 +20,7 @@ var Dengage = {
         exec(success, error, 'Dengage', 'setPermission', [permission])
     },
     setMobilePushToken: function (token, success, error) {
-        exec(success, error, 'Dengage', 'getMobilePushToken', [token])
+        exec(success, error, 'Dengage', 'setMobilePushToken', [token])
     },
     getMobilePushToken: function (success, error) {
         exec(success, error, 'Dengage', 'getMobilePushToken', [])
