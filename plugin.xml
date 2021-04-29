@@ -38,6 +38,9 @@
         </config-file>
 
         <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git"/>
+            </config>
             <pods>
                 <pod name="Dengage.Framework" spec="~> 2.5"/>
             </pods>

@@ -62,11 +62,17 @@ public class Dengage : CDVPlugin {
 
 
     @objc
-    func promptForPushNotificationsWithPermission(_ command: CDVInvokedUrlCommand) {
+    func promptForPushNotificationsWithCallback(_ command: CDVInvokedUrlCommand) {
         Dengage_Framework.Dengage.promptForPushNotifications() {
             hasPermission in self.commandDelegate.send(CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: hasPermission), callbackId: command.callbackId)
         }
     }
+
+    @objc
+    func setPermission(permission: Bool) {
+        Dengage_Framework.Dengage.setUserPermission(permission: permission)
+    }
+
 
     @objc
     func setContactKey(_ command: CDVInvokedUrlCommand) {
