@@ -43,6 +43,7 @@
             </config>
             <pods>
                 <pod name="Dengage.Framework" spec="~> 2.5"/>
+                <pod name="Dengage.Framework.Extensions" spec="~> 1.0.10"/>
             </pods>
         </podspec>
 
