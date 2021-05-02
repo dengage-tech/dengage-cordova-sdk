@@ -86,6 +86,29 @@ public class Dengage : CDVPlugin {
     }
 
     @objc
+    func setLogStatus(_ command: CDVInvokedUrlCommand) {
+        let isVisible = command.argument(at: 0) as! Bool ?? false
+
+        Dengage_Framework.Dengage.setLogStatus(isVisible: isVisible)
+
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func setMobilePushToken(_ command: CDVInvokedUrlCommand) {
+        let token: String = command.argument(at: 0) as! String ?? ""
+
+        Dengage_Framework.Dengage.setToken(token: token)
+
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: token)
+
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+
+    @objc
     func getContactKey(_ command: CDVInvokedUrlCommand) {
         let contactKey = Dengage_Framework.Dengage.getContactKey()
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: contactKey)
