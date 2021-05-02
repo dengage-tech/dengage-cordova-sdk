@@ -5,7 +5,8 @@
   "cordova": {
     "id": "cordova-plugin-dengage",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ]
   },
   "repository": {
@@ -15,8 +16,11 @@
   "keywords": [
     "dengage",
     "cordova-dengage",
+    "cordova-dengage-android",
+    "cordova-dengage-ios",
     "ecosystem:cordova",
-    "cordova-android"
+    "cordova-android",
+    "cordova-ios"
   ],
   "author": "",
   "license": "ISC",
