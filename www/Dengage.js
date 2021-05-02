@@ -82,7 +82,12 @@ var Dengage = {
     promptForPushNotificationsWithCallback: function (success, error) {
         exec(success, error, 'Dengage', 'promptForPushNotificationsWithCallback', [])
     },
-
+    setNavigation: function (success, error) {
+        exec(success, error, 'Dengage', 'setNavigation', [])
+    },
+    setNavigationWithName: function (screenName, success, error) {
+        exec(success, error, 'Dengage', 'setNavigationWithName', [screenName])
+    }
 };
 
 module.exports = Dengage
