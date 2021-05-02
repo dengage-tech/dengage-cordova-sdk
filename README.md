@@ -19,7 +19,25 @@ Following extra steps after the installation of the react-native-dengage SDK are
 
 <details>
   <summary> iOS Specific Extra steps </summary>
-  -Need to be write....
+
+### End Point Configuration
+
+For initial setup, if you have given URL addresses by Dengage Support team, you need to setup url address by using Plist
+file. Otherwise you don’t need to add anything to Plist file. For that you can add following code
+in `YourProject/config.xml`. It will add endpoints to your `info.plist` file.
+
+```xml
+
+<platform name="ios">
+    <edit-config file="*-Info.plist" mode="merge" target="DengageApiUrl">
+        <string>https://push.dengage.com</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="DengageEventApiUrl">
+        <string>https://event.dengage.com</string>
+    </edit-config>
+</platform>
+```
+
 </details>
 
 <details>
@@ -60,7 +78,8 @@ contains [steps mentioned here.](https://dev.dengage.com/mobile-sdk/android/huaw
 
 ### Change Subscription Api Endpoint
 
-You can change subscription api endpoint by adding following metadata tag in `AndroidManifest.xml`
+You can change subscription api endpoint by adding following metadata tag in `YourProject/config.xml`. It will then
+automatically update your `andoridManifest.xml` file with subscription api endpoint.
 
   ```
   <meta-data
@@ -73,7 +92,7 @@ Note: Please see API Endpoints By Datacenter to set your subscription end point.
 ### Changing Event Api Endpoint
 
 similar to subscription endpoints, you can change event api endpoints by setting following metadata tag
-in `AndroidManifest.xml`
+in `YourProject/config.xml`
 
   ```
   <meta-data
@@ -123,8 +142,16 @@ D·engage Mobile SDK for Huawei supports all new versions.
 
 - Using Callback Approach
 
+`Android Example:`
+
 ```Javascript
 Dengage.setupDengage(logStatus, firebaseKey, huaweiKey, successCallbackFunc, errorCallbackFunc)
+```
+
+`ios Example:`
+
+```Javascript
+Dengage.setupDengage(logStatus, integerationKey, lanuchOptions, successCallbackFunc, errorCallbackFunc)
 ```
 
 - Using Promise Approach
@@ -144,6 +171,8 @@ promisify(Dengage.setupDengage)(true, null, null)
     .then(() => 'Successfully Setup Dengage Code Here')
     .catch((err) => 'Error Handling Here')
 ```
+
+> Note: Android and Ios accept same number of parameters in `setupDenage` function but they have different value for that like `android accept` <b>logstatus</b>, <b>logstatus</b> && <b>firebaseKey</b>, <b>huaweiKey</b>, <b>successCallback</b>, <b>errorCallback</b> and `ios accept` <b>logstatus</b>, <b>integerationKey</b>, <b>launchOptions</b>, <b>successCallback</b>, <b>errorCallback</b>
 
 ### Subscription
 
@@ -169,8 +198,34 @@ well. [Apple Doc Reference](https://developer.apple.com/documentation/usernotifi
 If in your application, you want to get UserNotification permissions explicitly, you can do by calling one of the
 following methods:
 
+- Using Callback Approach
+
 ```Javascript
-// will update docs when starting on cordova dengage sdk for ios
+Dengage.promptForPushNotifications(successCallback, errorCallback)
+```
+
+- Using Promise Approach
+
+```Javascript
+promisify(Dengage.promptForPushNotifications)()
+    .then(() => 'Successfully promptForPushNotifications Code Here')
+    .catch((err) => 'Error Handling Here')
+```
+
+You can use following method to `promptForPushNotification` and get the value in `callback` or in `then` function of promise.
+
+```Javascript
+Dengage.promptForPushNotificationsWitCallback(function (hasPermission: Boolean) {
+    // do somthing with hasPermission flag.
+    // Note: hasPermission provides information if user enabled or disabled notification permission from iOS Settings > Notifications.
+}, function (error) {
+})
+```
+
+```Javascript
+promisify(Dengage.promptForPushNotificationsWitCallback)()
+    .then(hasPermission => 'hasPermission value is updated')
+    .catch(err => 'Error Handling Here')
 ```
 
 ### Setting Contact Key
@@ -337,7 +392,7 @@ you need to define your receiver in your `AndroidManifest.xml` file.
 </receiver>
 ```
 
-The SDK fires an event callback which is called onActionClick in your receiver class when an action button is clicked.
+The SDK fires an event Callback which is called onActionClick in your receiver class when an action button is clicked.
 So you can catch the button.
 
 ```java
