@@ -27,7 +27,6 @@ file. Otherwise you don’t need to add anything to Plist file. For that you can
 in `YourProject/config.xml`. It will add endpoints to your `info.plist` file.
 
 ```xml
-
 <platform name="ios">
     <edit-config file="*-Info.plist" mode="merge" target="DengageApiUrl">
         <string>https://push.dengage.com</string>
@@ -52,7 +51,7 @@ in `YourProject/config.xml`. It will add endpoints to your `info.plist` file.
 - Android Device or Emulator
 
 D·engage Android SDK provides an interface which handles push notification messages easily. Optionally, It also gives to
-send event functionality such as open and subscription to dEngage Platform.
+send event functionality such as open and subscription to Dengage Platform.
 
 Supports Android API level 4.1.x or higher.
 
@@ -81,7 +80,7 @@ contains [steps mentioned here.](https://dev.dengage.com/mobile-sdk/android/huaw
 You can change subscription api endpoint by adding following metadata tag in `YourProject/config.xml`. It will then
 automatically update your `andoridManifest.xml` file with subscription api endpoint.
 
-  ```
+  ```xml
   <meta-data
     android:name="den_event_api_url"
     android:value="https://your_event_api_endpoint" />
@@ -94,7 +93,7 @@ Note: Please see API Endpoints By Datacenter to set your subscription end point.
 similar to subscription endpoints, you can change event api endpoints by setting following metadata tag
 in `YourProject/config.xml`
 
-  ```
+  ```xml
   <meta-data
     android:name="den_push_api_url"
     android:value="https://your_push_api_endpoint" />
@@ -105,7 +104,6 @@ Note: Please see API Endpoints By Datacenter to set your event end point.
 Following is the sample code as an example for `Subscription/Event Api Endpoint`
 
 ```xml
-
 <config-file parent="./application" target="AndroidManifest.xml">
     <meta-data
             android:name="den_event_api_url"
@@ -212,7 +210,8 @@ promisify(Dengage.promptForPushNotifications)()
     .catch((err) => 'Error Handling Here')
 ```
 
-You can use following method to `promptForPushNotification` and get the value in `callback` or in `then` function of promise.
+You can use following method to `promptForPushNotification` and get the value in `callback` or in `then` function of
+promise.
 
 ```Javascript
 Dengage.promptForPushNotificationsWitCallback(function (hasPermission: Boolean) {
@@ -331,7 +330,7 @@ promisify(Dengage.setLogStatus)(logStatus)
 ### User Permission Management (optional)
 
 If you manage your own user permission states on your application you may send user permission by using
-setUserPermission method.
+`setPermission` method.
 
 #### Set User Permission
 
@@ -349,7 +348,7 @@ promisify(Dengage.setPermission)(permission)
     .catch((err) => 'Error Handling Here')
 ```
 
-#### Get User Permission
+#### Get User Permission (Android)
 
 - Using Callback Approach
 
@@ -365,52 +364,486 @@ promisify(Dengage.getPermission)
     .catch((err) => 'Error Handling Here')
 ```
 
-### Action Buttons
+### Handling Notification Action Callback
 
-Android SDK allows you to put clickable buttons under the notification.
+SDK provides a method if you want to get and parse payload manually for custom parameters or etc.
 
-#### Requirements
+- Using Callback Approach
+
+```javascript
+    Dengage.handleNotificationActionBlock(successCallbackFunc, errorCallbackFunc)
+```
+
+- Using Promise Approach
+
+```javascript
+promisify(Dengage.handleNotificationActionBlock)
+    .then((notificationResponse) => 'Successfully notificatoin response Code Here')
+    .catch((err) => 'Error Handling Here')
+
+```
+
+### DeepLinking
+
+SDK supports URL schema deeplink. If target url has a valid link, it will redirect to the related link. Please see
+related links below about deeplinking.
+
+<details>
+  <summary> iOS Specific Links</summary>
+
+[Apple Url Scheme Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/defining_a_custom_url_scheme_for_your_app)
+
+[Apple Universal Link](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content)
+
+</details>
+
+
+<details>
+  <summary> Android Specific Links </summary>
+
+
+[Create a deep link for a destination](https://developer.android.com/guide/navigation/navigation-deep-link)
+
+[Create Deep Links to App Content](https://developer.android.com/training/app-links/deep-linking)
+</details>
+
+### Rich Notifications <a name="rich_push" />
+
+Rich Notifications is a notification type which supports image, gif, video content. D·engage SDK supports varieties of
+contents and handles notification. Rich Notifications supports following media types:
+
+- Image
+- Video
+- Gif
+
+For further details about rich notification and its setup on iOS side please
+follow [this link](https://dev.dengage.com/mobile-sdk/ios/richnotification)
+
+> Note: on Android there is no special setup required for rich notifications.
+
+### Carousel Push <a name="carousel_push" />
+
+Carousel Push is a notification type which has a different UI than Rich Notification. SDK will handle notification
+payload and displays UI if it’s a carousel push. Carousel Push functionality allows you to show your notification with a
+slideshow.
+
+<details>
+  <summary> iOS </summary>
+
+### Requirements
+
+- iOS 10 or higher
+- Notification Service Extension
+- Notification Content Extension
+- Dengage.Framework.Extensions
+
+to setup Carousel Push on iOS you can follow [this link](https://dev.dengage.com/mobile-sdk/ios/carousel-push)
+</details>
+
+<details>
+  <summary> android </summary>
+
+### Requirements
 
 - Android SDK 2.0.0+
 
-Before you start, if you need to handle action buttons with yourself, then you need to set your receiver in
-androidmanifest.xml which extends from com.dengage.sdk.NotificationReceiver. Otherwise the SDK will handle button
-clicks.
+to setup Carousel Push on android you can follow [this link](https://dev.dengage.com/mobile-sdk/android/carousel-push)
+</details>
 
-you need to define your receiver in your `AndroidManifest.xml` file.
+### Action Buttons <a name="action_buttons" />
 
-```xml
+Android SDK allows you to put clickable buttons under the notification. Action buttons are supported in Android SDK
+2.0.0+. For further setup of Action Buttons,
+follow [this link](https://dev.dengage.com/mobile-sdk/android/action-buttons).
 
-<receiver android:name=".MyReceiver"
-          android:exported="false">
-    <intent-filter>
-        <action android:name="com.dengage.push.intent.RECEIVE"/>
-        <action android:name="com.dengage.push.intent.OPEN"/>
-        <action android:name="com.dengage.push.intent.DELETE"/>
-        <action android:name="com.dengage.push.intent.ACTION_CLICK"/>
-    </intent-filter>
-</receiver>
+### Event Collection <a name="event_collection" />
+
+In order to collect android mobile events and use that data to create behavioral segments in D·engage you have to
+determine the type of events and data that needs to collected. Once you have determined that, you will need to create a
+“Big Data” table in D·engage. Collected events will be stored in this table. Multiple tables can be defined depending on
+your specific need.
+
+Any type of event can be collected. The content and the structure of the events are completely flexible and can be
+changed according to unique business requirements. You will just need to define a table for events.
+
+Once defined, all you have to do is to send the event data to these tables. D·engage SDK has only two functions for
+sending events: `sendDeviceEvent` and `sendCustomEvent`. Most of the time you will just need the `sendDeviceEvent`
+function.
+
+### 1. Login / Logout Action
+
+If the user loggs in or you have user information, this means you have contact_key for that user. You can set
+contact_key in order to match user with the browser. There are two functions for getting and setting contact_key.
+
+### 1.a setContactKey
+
+If user logged in set user id. This is important for identifying your users. You can put this function call in every
+page. It will not send unnecessary events.
+[code example is here](#setting-contact-key)
+
+### 1.b getContactKey
+
+to get the current user information from SDK getContactKey method can be used.
+
+```Javascript
+// in the code, where user information required
+promisify(Dengage.getContactKey)()
+    .then(contactKey => 'ContactKey info here')
 ```
 
-The SDK fires an event Callback which is called onActionClick in your receiver class when an action button is clicked.
-So you can catch the button.
+### 2. Event Collection
 
-```java
-public class MyReceiver extends NotificationReceiver {  
-    @Override  
-  protected void onActionClick(Context context, Intent intent) {  
-        Bundle extras = intent.getExtras();  
-        if(extras != null)  
-        {  
-             String actionId = extras.getString("id");  
-             int notificationId = extras.getInt("notificationId");  
-             String targetUrl = extras.getString("targetUrl");  
-  
-             Log.d("DenPush", actionId +" is clicked");  
-        }  
-  
-       // Remove if you prefer to handle targetUrl which is actually correspond a deeplink.  
-       super.onActionClick(context, intent);  
-  }  
+If your D·engage account is an ecommerce account, you should use standard ecommerce events in the SDK. If you need some
+custom events or your account is not standard ecommerce account, you should use custom event functions.
+
+### 2.1 Events for Ecommerce Accounts
+
+There are standard ecommerce events in D·engage SDK.
+
+- [**Page View Events**](#page-view-events-details)
+    - Home page view
+    - Product page view
+    - Category page view
+    - Promotion page view
+
+- [**Shopping Cart Events**](#shopping-cart-events)
+    - Add to cart
+    - Remove from cart
+    - View Cart
+    - Begin Checkout
+
+- [**Order Events**](#order-events)
+    - Order
+    - Cancel order
+
+- [**Wishlist Events**](#wishlist-events)
+    - Add to wishlist
+    - Remove from wishlist
+
+- [**Search Event**](#search-event)
+
+For these event there are related tables in your account. Following are the details and sample codes for each of above
+events.
+
+**Page View Events** <a name="page-view-events-details" />
+Page view events will be sent to `page_view_events` table. If you add new columns to this table. You can send these in
+the event data.
+
+```Javascript
+// Home page view
+Dengage.pageView({
+    "page_type": "home"
+    // ... extra columns in page_view_events table, can be added here
+})
+
+// Category page view
+Dengage.pageView({
+    "page_type": "category",
+    "category_id": "1"
+    // ... extra columns in page_view_events table, can be added here
+})
+
+// Product page view
+Dengage.pageView({
+    "page_type": "product",
+    "product_id": "1"
+    // ... extra columns in page_view_events table, can be added here
+})
+
+//promotion page view
+Dengage.pageView({
+    "page_type": "promotion",
+    "promotion_id": "1"
+    // ... extra columns in page_view_events table, can be added here
+})
+
+//custom page view
+Dengage.pageView({
+    "page_type": "custom"
+    // ... extra columns in page_view_events table, can be added here
+})
+
+// For other pages you can send anything as page_type
+```
+
+### Shopping Cart Events <a name="shopping-cart-events" />
+
+These events will be stored in `shopping_cart_events` and `shopping_cart_events_detail`. There are 4 shopping cart event
+functions. `addToCart`, `removeFromCart`, `viewCart`, `beginCheckout` Every shopping cart event function needs all items
+in cart as an array. You must send last version of the shopping cart.
+
+For example: If there is one item in cart and item id is 5. And after that, an add to cart action is happened with the
+item id 10. You have to send 10 as `product_id` in event parameters and you must send current version of cart items.
+Meaning [5, 10]
+
+```Javascript
+// All items currently exists in shopping cart must be added to an array
+const cartItem = {} // cartItem will be an object with key:value types as String:Any
+
+cartItem["product_id"] = 1
+cartItem["product_variant_id"] = 1
+cartItem["quantity"] = 1
+cartItem["unit_price"] = 10.00
+cartItem["discounted_price"] = 9.99
+// ... extra columns in shopping_cart_events_detail table, can be added in cartItem
+
+let cartItems = []
+cartItems.push(cartItem)
+cartItems.push(cartItem2)
+
+
+// Add to cart action
+const addParams = {
+    "product_id": 1,
+    "product_variant_id": 1,
+    "quantity": 1,
+    "unit_price": 10.00,
+    "discounted_price": 9.99,
+    // ... extra columns in shopping_cart_events table, can be added here
+    "cartItems": cartItems // all items in cart
 }
+Dengage.addToCart(addParams)
+
+// ....
+// Remove from cart action
+const removeParams = {
+    "product_id": 1,
+    "product_variant_id": 1,
+    "quantity": 1,
+    "unit_price": 10.00,
+    "discounted_price": 9.99,
+    // ... extra columns in shopping_cart_events table, can be added here
+    "cartItems": cartItems // all items in cart
+}
+Dengage.removeFromCart(removeParams)
+
+// view cart action
+const viewParams = {
+    // ... extra columns in shopping_cart_events table, can be added here
+    "cartItems": cartItems
+}
+Dengage.viewCart(viewParams)
+
+// begin checkout action
+var checkoutParams = {
+    // ... extra columns in shopping_cart_events table, can be added here
+    "cartItems": cartItems
+}
+Dengage.beginCheckout(checkoutParams)
 ```
+
+### Order Events <a name="order-events" />
+
+Orders events will be sent to order_events and order_events_detail tables.
+
+```Javascript
+// Ordered items or canceled items must be added to an array
+const cartItem = {}
+
+cartItem["product_id"] = 1
+cartItem["product_variant_id"] = 1
+cartItem["quantity"] = 1
+cartItem["unit_price"] = 10.00
+cartItem["discounted_price"] = 9.99
+// ... extra columns in order_events_detail table, can be added in cartItem
+
+const cartItems = []
+cartItems.push(cartItem)
+cartItems.push(cartItem2)
+// ... ordered or canceled items must be added
+
+
+// Place order action
+const placeOrderParams = {
+    "order_id": 1,
+    "item_count": 1, // total ordered item count
+    "total_amount": 1, // total price
+    "discounted_price": 9.99, // use total price if there is no discount
+    "payment_method": "card",
+    "shipping": 5,
+    "coupon_code": "",
+    // ... extra columns in order_events table, can be added here
+    "cartItems": cartItems //ordered items
+}
+Dengage.placeOrder(placeOrderParams)
+
+// Cancel order action
+const cancelParams = {
+    "order_id": 1, // canceled order id
+    "item_count": 1, // canceled total item count
+    "total_amount": 1, // canceled item's total price
+    "discounted_price": 9.99, // use total price if there is no discount
+    // ... extra columns in order_events table, can be added here
+    "cartItems": cartItems // // canceled items 
+}
+Dengage.cancelOrder(cancelParams)
+```
+
+### Wishlist Event <a name="wishlist-events" />
+
+These events will be stored in `wishlist_events` and `wishlist_events_detail`. There are 2 wishlist event
+functions. `addToWishlist`, `removeFromWishlist`. In every event call, you can send all items in wishlist. It makes it
+easy to track current items in wishlist.
+
+```Javascript
+// Current items in wishlist
+const wishListItem = {}
+wishListItem["product_id"] = 1
+
+const wishListItems = []
+wishListItems.push(wishListItem)
+
+
+// Add to wishlist action
+const params = {
+    "product_id": 1,
+    // ... extra columns in wishlist_events table, can be added here
+    "items": wishlistItems // current items
+}
+Dengage.addToWishList(params)
+
+// Remove from wishlist action
+const removeParams = {
+  "product_id": 1,
+  // ... extra columns in wishlist_events table, can be added here
+  "items": wishlistItems // current items
+}
+Dengage.removeFromWishList(removeParams)
+```
+
+### Search Event <a name="search-event"/>
+
+Search events will be stored in `search_events` table.
+
+```Javascript
+  const params = {
+    "keywords": "some product name", // text in the searchbox
+    "result_count": 12,
+    "filters": "" //you can send extra filters selected by user here. Formating is not specified
+    // ... extra columns in search_events table, can be added here
+}
+Dengage.search(params)
+```
+
+### 2.1 Custom Events
+
+#### Send device specific events
+
+You can use `sendDeviceEvent` function for sending events for the device. Events are sent to a big data table defined in
+your D·engage account. That table must have relation to the `master_device` table. If you set `contact_key` for that
+device. Collected events will be associated for that user.
+
+```Javascript
+// for example if you have a table named "events"
+// and events table has "key", "event_date", "event_name", "product_id" columns
+// you just have to send the columns except "key" and "event_date", because those columns sent by the SDK
+// methodSignature => dengage(‘sendDeviceEvent’, tableName: String, dataObject, callback);
+const params = {
+    "event_name": "page_view",
+    "product_id": "1234",
+}
+Dengage.SendDeviceEvent(toEventTable
+:
+'events', andWithEventDetails
+:
+params, (err, res) => {
+    // handle error or success response.
+}
+)
+```
+
+### App Inbox
+
+App Inbox is a screen within a mobile app that stores persistent messages. It’s kind of like an email inbox, but it
+lives inside the app itself. App Inbox differs from other mobile channels such as push notifications or in-app messages.
+For both push and in-app messages, they’re gone once you open them.
+
+In other words, D·engage admin panel lets you keep selected messages on the platform and Mobile SDK may retreive and
+display these messages when needed.
+
+In order to save messages into App Inbox, you need to select “Save to Inbox” option when sending messages in D·engage
+admin panel by assigning an expire date to it.
+
+Inbox messages are kept in the memory storage of the phone until app is completely closed or for a while and D·engage
+SDK provides functions for getting and managing these messages.
+
+#### Requirements
+
+- *Android*: D·engage SDK 3.2.3+
+- *iOS*: D·engage SDK 2.5.21+
+
+#### Methods
+
+There are 3 methods to manage App Inbox Messages
+
+- To get app inbox messages from the server
+  ```
+    const inboxMessages = await Dengage.getInboxMessages(offset, limit).catch(err => err)
+    // where offset: Int, limit: Int = 20
+    // inboxMessages now either have array of Inbox messages or an error.
+  ```
+- To delete a specific message from the inbox.
+  ```
+    const delMsgResponse = await Dengage.deleteInboxMessage(id).catch(err => err)
+    // where id: String
+    // delMsgResponse now either have {success: true, id: "id-of-msg-deleted"} or an error
+  ```
+
+- to mark a specific message as clicked.
+  ```
+    const msgSetAsClicked = await Dengage.setInboxMessageAsClicked(id).catch(err => err)
+    // where id: String &
+    // msgSetAsClicked now either have {success: true, id: "id-of-msg-deleted"} or an error
+  ```
+
+### In-App Messaging
+
+In-app message is a type of mobile message where the notification is displayed within the app. It is not sent in a
+specific time but it is show to user when user are using the app. Examples include popups, yes/no prompts, banners, and
+more. In order to show in-app messages, there is no permission requirement.
+
+#### Requirements
+
+- iOS: D·engage SDK 3.2.3+
+- android: D·engage SDK 3.2.3+
+
+#### Methods
+
+> These function need to be check and test. It will not properly available right now.
+
+Created messages will be stored in D·engage backend and will be served to mobile SDKs. If you integrated mobile SDK
+correctly for push messages, for using in-app features you just have to add setNavigtion function to every page
+navigation. If you want to use screen name filter, you should send screen name to setNavigation function in every page
+navigation.
+
+#### Simple In App Messaging
+
+  ```
+  Dengage.setNavigation()
+  ```
+
+#### In App Messaging with Screen Name
+
+  ```
+  Dengage.setNavigation('cart')
+  ```
+
+#### In App Messaging with Screen Name and Page Data
+
+  ```
+  //
+  // (Coming soon)
+  // Scheduled: April 2021
+  // if you have extra information 
+  // you can send them to use screen data filters.
+  const screenData = {productId: "~hs7674", price: 1200}
+  Dengage.setNavigation('product', screenData)
+  ```
+
+## Contributing
+
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+
+## License
+
+MIT
