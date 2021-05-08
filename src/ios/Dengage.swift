@@ -467,7 +467,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func setNavigation (_ command: CDVInvokedUrlCommand) -> Void {
-        //Dengage_Framework.Dengage.setNavigation()
+        Dengage_Framework.Dengage.setNavigation()
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
@@ -478,7 +478,7 @@ public class Dengage : CDVPlugin {
     func setNavigationWithName (_ command: CDVInvokedUrlCommand) -> Void {
         let screenName: String = command.argument(at: 0) as! String
 
-        //Dengage_Framework.Dengage.setNavigation(screenName: screenName as String)
+        Dengage_Framework.Dengage.setNavigation(screenName: screenName as String)
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
