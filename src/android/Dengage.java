@@ -514,7 +514,7 @@ public class Dengage extends CordovaPlugin {
 
     private void setNavigation(CallbackContext callbackContext) {
         try {
-//             this.manager.setNavigation((AppCompatActivity) this.cordova.getActivity());
+            this.manager.setNavigation(this.cordova.getActivity());
 
             callbackContext.success();
         } catch (Exception e) {
@@ -524,7 +524,11 @@ public class Dengage extends CordovaPlugin {
 
     private void setNavigationWithName(String name, CallbackContext callbackContext) {
         try {
-//             this.manager.setNavigation((AppCompatActivity)this.cordova.getActivity(), name);
+             if (isEmptyOrNull(name)) {
+                 this.manager.setNavigation(this.cordova.getActivity());
+             } else {
+                 this.manager.setNavigation(this.cordova.getActivity(), name);
+             }
 
             callbackContext.success();
         } catch (Exception e) {
