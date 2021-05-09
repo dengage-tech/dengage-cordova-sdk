@@ -9,7 +9,7 @@ allprojects {
 }
 
 dependencies {
-      implementation 'com.github.whitehorse-technology:dengage.android.sdk:3.2.4'
+      implementation 'com.github.whitehorse-technology:dengage.android.sdk:4.0.1'
       implementation 'com.huawei.hms:ads-identifier:3.4.28.313'
 
       implementation 'com.google.code.gson:gson:+'

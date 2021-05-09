@@ -1,5 +1,7 @@
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.dengage.sdk.DengageEvent;
 import com.dengage.sdk.DengageManager;
 import com.dengage.sdk.callback.DengageCallback;
@@ -183,6 +185,17 @@ public class Dengage extends CordovaPlugin {
         if (action.equals("setInboxMessageAsClicked")) {
             String id = args.getString(0);
             this.setInboxMessageAsClicked(id, callbackContext);
+            return true;
+        }
+
+        if (action.equals("setNavigation")) {
+            this.setNavigation(callbackContext);
+            return true;
+        }
+
+        if (action.equals("setNavigationWithName")) {
+            String name = args.getString(0);
+            this.setNavigationWithName(name, callbackContext);
             return true;
         }
 
@@ -494,6 +507,26 @@ public class Dengage extends CordovaPlugin {
             obj.put("id", id);
 
             callbackContext.success(obj);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setNavigation(CallbackContext callbackContext) {
+        try {
+//             this.manager.setNavigation((AppCompatActivity) this.cordova.getActivity());
+
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setNavigationWithName(String name, CallbackContext callbackContext) {
+        try {
+//             this.manager.setNavigation((AppCompatActivity)this.cordova.getActivity(), name);
+
+            callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }

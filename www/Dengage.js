@@ -87,6 +87,9 @@ var Dengage = {
     },
     setNavigationWithName: function (screenName, success, error) {
         exec(success, error, 'Dengage', 'setNavigationWithName', [screenName])
+    },
+    setNavigationWithNameAndData: function (screenName, screenData, success, error) {
+        exec(success, error, 'Dengage', 'setNavigationWithNameAndData', [screenName, screenData])
     }
 };
 
