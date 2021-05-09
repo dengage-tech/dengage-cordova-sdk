@@ -476,9 +476,13 @@ public class Dengage : CDVPlugin {
 
     @objc
     func setNavigationWithName (_ command: CDVInvokedUrlCommand) -> Void {
-        let screenName: String = command.argument(at: 0) as! String
+        let screenName: String = command.argument(at: 0) as! String? ?? ""
 
-        Dengage_Framework.Dengage.setNavigation(screenName: screenName as String)
+        if (screenName == "") {
+            Dengage_Framework.Dengage.setNavigation()
+        } else {
+            Dengage_Framework.Dengage.setNavigation(screenName: screenName as String)
+        }
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
