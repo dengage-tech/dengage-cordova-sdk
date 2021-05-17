@@ -5,7 +5,7 @@ omnichannel marketing features. It replaces your marketing automation and cross-
 details about D·engage please [visit here](https://dev.dengage.com).
 
 This package makes it easy to integrate, D·engage, with your Cordova iOS and/or Android apps. Following are
-instructions for installation of cordova-dengage SDK to your cordova applications.
+instructions for installation of cordova-dengage SDK to your cordova applications. For *Sample App* please [visit here](https://github.com/dengage-tech/dengage-cordova-sdk-sample).
 
 ## Installation
 
@@ -803,8 +803,7 @@ more. In order to show in-app messages, there is no permission requirement.
 - android: D·engage SDK 3.2.3+
 
 #### Methods
-
-> These function need to be check and test. It will not properly available right now.
+These function need to be check and test. It will not properly available right now.
 
 Created messages will be stored in D·engage backend and will be served to mobile SDKs. If you integrated mobile SDK
 correctly for push messages, for using in-app features you just have to add setNavigtion function to every page
