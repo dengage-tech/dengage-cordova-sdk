@@ -4,8 +4,8 @@
 omnichannel marketing features. It replaces your marketing automation and cross-channel campaign management. For further
 details about D·engage please [visit here](https://dev.dengage.com).
 
-This package makes it easy to integrate, D·engage, with your React-Native iOS and/or Android apps. Following are
-instructions for installation of react-native-dengage SDK to your react-native applications.
+This package makes it easy to integrate, D·engage, with your Cordova iOS and/or Android apps. Following are
+instructions for installation of cordova-dengage SDK to your cordova applications.
 
 ## Installation
 
@@ -15,7 +15,7 @@ cordova plugin add cordova-plugin-dengage
 
 ## Platform Specific Extra Steps
 
-Following extra steps after the installation of the react-native-dengage SDK are required for it to work properly.
+Following extra steps after the installation of the cordova-dengage SDK are required for it to work properly.
 
 <details>
   <summary> iOS Specific Extra steps </summary>
@@ -742,14 +742,9 @@ const params = {
     "event_name": "page_view",
     "product_id": "1234",
 }
-Dengage.SendDeviceEvent(toEventTable
-:
-'events', andWithEventDetails
-:
-params, (err, res) => {
+Dengage.SendDeviceEvent(toEventTable, andWithEventDetails, (err, res) => {
     // handle error or success response.
-}
-)
+})
 ```
 
 ### App Inbox
