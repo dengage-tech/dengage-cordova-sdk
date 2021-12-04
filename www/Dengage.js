@@ -64,6 +64,9 @@ var Dengage = {
     search: function (data, success, error) {
         exec(success, error, 'Dengage', 'search', [data])
     },
+    setTags: function (data, success, error) {
+        exec(success, error, 'Dengage', 'setTags', [data])
+    },
     sendDeviceEvent: function (tableName, data, success, error) {
         exec(success, error, 'Dengage', 'sendDeviceEvent', [tableName, data])
     },

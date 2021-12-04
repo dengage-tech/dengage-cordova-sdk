@@ -1,12 +1,12 @@
 import android.content.Context;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.dengage.sdk.DengageEvent;
 import com.dengage.sdk.DengageManager;
 import com.dengage.sdk.callback.DengageCallback;
 import com.dengage.sdk.models.DengageError;
+import com.dengage.sdk.models.TagItem;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -17,7 +17,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class Dengage functions called from JavaScript.
@@ -56,6 +59,13 @@ public class Dengage extends CordovaPlugin {
             this.setLogStatus(logStatus, callbackContext);
             return true;
         }
+
+        if (action.equals("setTags")) {
+            JSONArray data = new JSONArray(args.getString(0));
+            this.setTags(data, callbackContext);
+            return true;
+        }
+
 
         if (action.equals("setPermission")) {
             boolean permission = Boolean.parseBoolean(args.getString(0));
@@ -254,6 +264,42 @@ public class Dengage extends CordovaPlugin {
     private void setPermission(boolean permission, CallbackContext callbackContext) {
         try {
             this.manager.setPermission(permission);
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setTags(JSONArray data, CallbackContext callbackContext) {
+        try {
+
+            List<LinkedTreeMap<String, String>> tagList = new Gson().fromJson(data.toString(), List.class);
+            List<TagItem> finalTags = new ArrayList<TagItem>();
+
+            for (LinkedTreeMap<String, String> tagItem : tagList) {
+                if (tagItem.get("tagName") != null && tagItem.get("tagValue") != null) {
+                    if (tagItem.get("changeTime") != null && tagItem.get("changeValue") != null && tagItem.get("removeTime") != null) {
+                        Date changeTime = null;
+                        if (tagItem.get("changeTime") != null) {
+                            changeTime = new Date(tagItem.get("changeTime"));
+                        }
+                        Date removeTime = null;
+                        if (tagItem.get("changeTime") != null) {
+                            removeTime = new Date(tagItem.get("changeTime"));
+                        }
+
+                        finalTags.add(new TagItem(tagItem.get("tagName"), tagItem.get("tagValue"), changeTime, tagItem.get("changeValue"), removeTime));
+                    } else {
+                        finalTags.add(new TagItem(tagItem.get("tagName"), tagItem.get("tagValue")));
+                    }
+                } else {
+                    callbackContext.error("required argument 'tagName' Or 'tagValue' is missing.");
+                    return;
+                }
+            }
+
+            this.manager.setTags(finalTags);
+
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(e.getMessage());

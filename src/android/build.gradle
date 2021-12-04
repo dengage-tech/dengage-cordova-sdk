@@ -4,12 +4,12 @@ allprojects {
          jcenter()
          google()
          maven { url "https://jitpack.io" }
-         maven { url 'http://developer.huawei.com/repo/' }
+         maven { url 'https://developer.huawei.com/repo/' }
     }
 }
 
 dependencies {
-      implementation 'com.github.whitehorse-technology:dengage.android.sdk:4.0.1'
+      implementation 'com.github.whitehorse-technology:dengage.android.sdk:4.1.6'
       implementation 'com.huawei.hms:ads-identifier:3.4.28.313'
 
       implementation 'com.google.code.gson:gson:+'
