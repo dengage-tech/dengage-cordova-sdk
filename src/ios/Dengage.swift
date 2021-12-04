@@ -490,6 +490,29 @@ public class Dengage : CDVPlugin {
 
     }
 
+    @objc
+    func setTags(_ command: CDVInvokedUrlCommand) -> Void {
+        let data = command.argument(at: 0) as! [NSDictionary]
+
+
+        var tags: [TagItem] = []
+        for tag in data {
+            let tagItem:TagItem = TagItem.init(
+                tagName: tag["tagName"] as! String,
+                tagValue: tag["tagValue"] as! String,
+                changeTime: tag["changeTime"] as! Date?,
+                removeTime: tag["removeTime"] as! Date?,
+                changeValue: tag["changeValue"] as! String?
+            )
+            tags.append(tagItem)
+        }
+        Dengage_Framework.Dengage.setTags(tags)
+
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
     private func sendToken(_ token: String ){
         Dengage_Framework.Dengage.setToken(token: token)
     }
