@@ -16,6 +16,9 @@ var Dengage = {
     setLogStatus: function (logStatus, success, error) {
         exec(success, error, 'Dengage', 'setLogStatus', [logStatus])
     },
+    registerNotification: function (success, error) {
+        exec(success, error, 'Dengage', 'registerNotification', [])
+    },
     setPermission: function (permission, success, error) {
         exec(success, error, 'Dengage', 'setPermission', [permission])
     },

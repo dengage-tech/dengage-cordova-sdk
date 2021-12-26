@@ -1,17 +1,26 @@
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 
 import com.dengage.sdk.DengageEvent;
 import com.dengage.sdk.DengageManager;
+import com.dengage.sdk.NotificationReceiver;
 import com.dengage.sdk.callback.DengageCallback;
 import com.dengage.sdk.models.DengageError;
+import com.dengage.sdk.models.Message;
 import com.dengage.sdk.models.TagItem;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.PluginResult;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -209,6 +218,11 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("registerNotification")) {
+            this.registerNotification(callbackContext);
+            return true;
+        }
+
         return false;
     }
 
@@ -300,7 +314,7 @@ public class Dengage extends CordovaPlugin {
 
             this.manager.setTags(finalTags);
 
-            callbackContext.success();
+            callbackContext.success(finalTags.size());
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }
@@ -570,13 +584,26 @@ public class Dengage extends CordovaPlugin {
 
     private void setNavigationWithName(String name, CallbackContext callbackContext) {
         try {
-             if (isEmptyOrNull(name)) {
-                 this.manager.setNavigation(this.cordova.getActivity());
-             } else {
-                 this.manager.setNavigation(this.cordova.getActivity(), name);
-             }
+            if (isEmptyOrNull(name)) {
+                this.manager.setNavigation(this.cordova.getActivity());
+            } else {
+                this.manager.setNavigation(this.cordova.getActivity(), name);
+            }
 
             callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void registerNotification(CallbackContext callbackContext) {
+        try {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("com.dengage.push.intent.RECEIVE");
+            filter.addAction("com.dengage.push.intent.OPEN");
+
+            NotifReciever notifReciever = new NotifReciever(callbackContext);
+            context.registerReceiver(notifReciever, filter);
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }
@@ -592,5 +619,53 @@ public class Dengage extends CordovaPlugin {
         }
 
         return false;
+    }
+}
+
+class NotifReciever extends NotificationReceiver {
+    CallbackContext notifyCallbackContext = null;
+
+    NotifReciever(CallbackContext notifyCallbackContext) {
+        this.notifyCallbackContext = notifyCallbackContext;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String intentAction = intent.getAction();
+        if (intentAction != null && notifyCallbackContext != null) {
+            switch (intentAction.hashCode()) {
+                case -825236177:
+                    if (intentAction.equals("com.dengage.push.intent.RECEIVE")) {
+                        Bundle val = intent.getExtras();
+                        Message message = val != null ? new Message(val) : null;
+                        String json = message.toJson();
+                        JsonParser parser = new JsonParser();
+                        JsonElement jsonElement = parser.parse(json);
+                        JsonObject jsonObject = jsonElement.getAsJsonObject();
+                        jsonObject.addProperty("eventType", "PUSH_RECEIVE");
+
+
+                        PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
+                        result.setKeepCallback(true);
+                        notifyCallbackContext.sendPluginResult(result);
+                    }
+                    break;
+                case -520704162:
+                    if (intentAction.equals("com.dengage.push.intent.OPEN")) {
+                        Bundle val = intent.getExtras();
+                        Message message = val != null ? new Message(val) : null;
+                        String json = message.toJson();
+                        JsonParser parser = new JsonParser();
+                        JsonElement jsonElement = parser.parse(json);
+                        JsonObject jsonObject = jsonElement.getAsJsonObject();
+                        jsonObject.addProperty("eventType", "PUSH_RECEIVE");
+
+                        PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
+                        result.setKeepCallback(true);
+                        notifyCallbackContext.sendPluginResult(result);
+                    }
+                    break;
+            }
+        }
     }
 }
