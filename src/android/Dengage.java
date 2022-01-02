@@ -658,7 +658,7 @@ class NotifReciever extends NotificationReceiver {
                         JsonParser parser = new JsonParser();
                         JsonElement jsonElement = parser.parse(json);
                         JsonObject jsonObject = jsonElement.getAsJsonObject();
-                        jsonObject.addProperty("eventType", "PUSH_RECEIVE");
+                        jsonObject.addProperty("eventType", "PUSH_OPEN");
 
                         PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
                         result.setKeepCallback(true);

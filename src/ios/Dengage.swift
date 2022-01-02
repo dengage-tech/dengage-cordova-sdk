@@ -490,6 +490,66 @@ public class Dengage : CDVPlugin {
 
     }
 
+
+    @objc
+    func registerNotification (_ command: CDVInvokedUrlCommand)-> Void {
+      Dengage_Framework.Dengage.handleNotificationActionBlock { (notificationResponse) in
+          var response = [String:Any?]();
+          response["actionIdentifier"] = notificationResponse.actionIdentifier
+
+          var notification = [String:Any?]()
+          notification["date"] = notificationResponse.notification.date.description
+
+          var notificationReq = [String:Any?]()
+          notificationReq["identifier"] = notificationResponse.notification.request.identifier
+
+          if (notificationResponse.notification.request.trigger?.repeats != nil) {
+              var notificationReqTrigger = [String:Any?]()
+              notificationReqTrigger["repeats"] = notificationResponse.notification.request.trigger?.repeats ?? nil
+              notificationReq["trigger"] = notificationReqTrigger
+          }
+
+          var reqContent = [String:Any?]()
+          var contentAttachments = [Any]()
+          for attachement in notificationResponse.notification.request.content.attachments {
+              var contentAttachment = [String:Any?]()
+              contentAttachment["identifier"] = attachement.identifier
+              contentAttachment["url"] = attachement.url
+              contentAttachment["type"] = attachement.type
+              contentAttachments.append(contentAttachment)
+          }
+          reqContent["badge"] = notificationResponse.notification.request.content.badge
+          reqContent["body"] = notificationResponse.notification.request.content.body
+          reqContent["categoryIdentifier"] = notificationResponse.notification.request.content.categoryIdentifier
+          reqContent["launchImageName"] = notificationResponse.notification.request.content.launchImageName
+          reqContent["subtitle"] = notificationResponse.notification.request.content.subtitle
+          reqContent["threadIdentifier"] = notificationResponse.notification.request.content.threadIdentifier
+          reqContent["title"] = notificationResponse.notification.request.content.title
+          reqContent["userInfo"] = notificationResponse.notification.request.content.userInfo // todo: make sure it is RCTCovertible & doesn't break the code
+          if #available(iOS 12.0, *) {
+              reqContent["summaryArgument"] = notificationResponse.notification.request.content.summaryArgument
+              reqContent["summaryArgumentCount"] = notificationResponse.notification.request.content.summaryArgumentCount
+          }
+          if #available(iOS 13.0, *) {
+              reqContent["targetContentIdentifier"] = notificationResponse.notification.request.content.targetContentIdentifier
+          }
+
+
+          reqContent["attachments"] = contentAttachments
+          notificationReq["content"] = reqContent
+          notification["request"] = notificationReq
+          response["notification"] = notification
+
+          response["eventType"] = "PUSH_OPEN"
+
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: response)
+
+          pluginResult.setKeepCallbackAs(true)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+       }
+    }
+
     @objc
     func setTags(_ command: CDVInvokedUrlCommand) -> Void {
         let data = command.argument(at: 0) as! [NSDictionary]
