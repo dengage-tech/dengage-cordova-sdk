@@ -56,7 +56,7 @@ public class DengageCR extends CordovaPlugin {
             String firebaseKey = args.getString(1);
             String huaweiKey = args.getString(2);
 
-            this.setupDengage(logStatus, firebaseKey, huaweiKey,context);
+            this.setupDengage(logStatus, firebaseKey, huaweiKey,context,callbackContext);
             return true;
         }
 
@@ -284,7 +284,7 @@ public class DengageCR extends CordovaPlugin {
         return false;
     }
 
-        public void setupDengage(boolean logStatus, String firebaseKey, String huaweiKey, Context context) {
+        public void setupDengage(boolean logStatus, String firebaseKey, String huaweiKey, Context context, CallbackContext callbackContext) {
         try {
             this.context = context;
             this.manager = DengageManager.getInstance(this.context);
@@ -308,9 +308,9 @@ public class DengageCR extends CordovaPlugin {
                         .init();
             }
 
-          //  callbackContext.success();
+            callbackContext.success();
         } catch (Exception e) {
-            //callbackContext.error(e.getMessage());
+            callbackContext.error(e.getMessage());
         }
     }
 
