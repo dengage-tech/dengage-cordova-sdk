@@ -1,8 +1,8 @@
 var exec = require('cordova/exec');
 
 var DengageCR = {
-    setupDengage: function (logStatus, firebaseKey, huaweiKey, success, error) {
-        exec(success, error, 'DengageCR', 'setupDengage', [logStatus, firebaseKey, huaweiKey]);
+    setupDengage: function (logStatus, firebaseKey, success, error) {
+        exec(success, error, 'DengageCR', 'setupDengage', [logStatus, firebaseKey]);
     },
     setHuaweiIntegrationKey: function (key, success, error) {
         exec(success, error, 'DengageCR', 'setHuaweiIntegrationKey', [key])

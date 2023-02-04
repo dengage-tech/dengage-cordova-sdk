@@ -54,9 +54,8 @@ public class DengageCR extends CordovaPlugin {
         if (action.equals("setupDengage")) {
             boolean logStatus = Boolean.parseBoolean(args.getString(0));
             String firebaseKey = args.getString(1);
-            String huaweiKey = args.getString(2);
 
-            this.setupDengage(logStatus, firebaseKey, huaweiKey,context);
+            this.setupDengage(logStatus, firebaseKey,context, callbackContext);
             return true;
         }
 
@@ -85,11 +84,7 @@ public class DengageCR extends CordovaPlugin {
             return true;
         }
 
-        if (action.equals("setHuaweiIntegrationKey")) {
-            String key = args.getString(0);
-            this.setHuaweiIntegrationKey(key, callbackContext);
-            return true;
-        }
+
 
         if (action.equals("setFirebaseIntegrationKey")) {
             String key = args.getString(0);
@@ -284,7 +279,7 @@ public class DengageCR extends CordovaPlugin {
         return false;
     }
 
-        public void setupDengage(boolean logStatus, String firebaseKey, String huaweiKey, Context context) {
+        public void setupDengage(boolean logStatus, String firebaseKey, Context context,CallbackContext callbackContext) {
         try {
             this.context = context;
             this.manager = DengageManager.getInstance(this.context);
@@ -295,22 +290,11 @@ public class DengageCR extends CordovaPlugin {
                         .setLogStatus(logStatus)
                         .setFirebaseIntegrationKey(firebaseKey)
                         .init();
-            } else if (!this.isEmptyOrNull(huaweiKey)) {
-                this.manager
-                        .setLogStatus(logStatus)
-                        .setHuaweiIntegrationKey(huaweiKey)
-                        .init();
-            } else {
-                this.manager
-                        .setLogStatus(logStatus)
-                        .setHuaweiIntegrationKey(huaweiKey)
-                        .setFirebaseIntegrationKey(firebaseKey)
-                        .init();
-            }
+            }  
 
-          //  callbackContext.success();
+            callbackContext.success();
         } catch (Exception e) {
-            //callbackContext.error(e.getMessage());
+            callbackContext.error(e.getMessage());
         }
     }
 
@@ -386,14 +370,7 @@ public class DengageCR extends CordovaPlugin {
         }
     }
 
-    private void setHuaweiIntegrationKey(String key, CallbackContext callbackContext) {
-        try {
-            this.manager.setHuaweiIntegrationKey(key);
-            callbackContext.success(key);
-        } catch (Exception e) {
-            callbackContext.error(e.getMessage());
-        }
-    }
+
 
     private void getMobilePushToken(CallbackContext callbackContext) {
         try {
