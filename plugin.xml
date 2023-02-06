@@ -22,12 +22,14 @@
         <preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="23.0.2"/>
         <preference name="ANDROID_FIREBASE_CORE_VERSION" default="20.1.2"/>
         <preference name="ANDROID_FIREBASE_FIREBASE_ANALYTICS" default="18.0.2"/>
+        <preference name="ANDROID_DENGAGE_SDK" default="6.0.9.1"/>
 
         <framework src="src/android/build.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
         <framework src="com.google.firebase:firebase-messaging:$ANDROID_FIREBASE_MESSAGING_VERSION"/>
         <framework src="com.google.firebase:firebase-analytics:$ANDROID_FIREBASE_FIREBASE_ANALYTICS"/>
-    </platform>
+        <framework src="com.github.dengage-tech:dengage-android-sdk:$ANDROID_DENGAGE_SDK"/>
+     </platform>
 
     <platform name="ios">
         <config-file parent="/*" target="config.xml">
