@@ -559,8 +559,15 @@ public class DengageCR : CDVPlugin {
           response["notification"] = notification
 
           response["eventType"] = "PUSH_OPEN"
-
-          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: response)
+              //JSONSerialization.jsonObject(with: response)
+          var convertedString = ""
+          do {
+                  let data =  try JSONSerialization.data(withJSONObject: response, options: JSONSerialization.WritingOptions.prettyPrinted)
+              convertedString = String(data: data, encoding: String.Encoding.utf8) ?? ""
+                } catch let myJSONError {
+                    print(myJSONError)
+                }
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: convertedString)
 
           pluginResult.setKeepCallbackAs(true)
 
