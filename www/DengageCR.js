@@ -1,8 +1,8 @@
 var exec = require('cordova/exec');
 
 var DengageCR = {
-    setupDengage: function (logStatus, firebaseKey, huaweiKey, success, error) {
-        exec(success, error, 'DengageCR', 'setupDengage', [logStatus, firebaseKey, huaweiKey]);
+    setupDengage: function (logStatus, firebaseKey, huaweiKey, enableGeofence , success, error) {
+        exec(success, error, 'DengageCR', 'setupDengage', [logStatus, firebaseKey, huaweiKey, enableGeofence]);
     },
     setHuaweiIntegrationKey: function (key, success, error) {
         exec(success, error, 'DengageCR', 'setHuaweiIntegrationKey', [key])
@@ -117,6 +117,15 @@ var DengageCR = {
     },
     setPartnerDeviceId: function (adid,  success, error) {
         exec(success, error, 'DengageCR', 'setPartnerDeviceId', [adid])
+    },
+    stopGeofence: function (success, error) {
+        exec(success, error, 'DengageCR', 'stopGeofence', [])
+    },
+    requestLocationPermissions: function (success, error) {
+         exec(success, error, 'DengageCR', 'requestLocationPermissions', [])
+    },
+    startGeofence: function (success, error) {
+         exec(success, error, 'DengageCR', 'startGeofence', [])
     },
     
 };

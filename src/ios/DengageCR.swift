@@ -4,8 +4,8 @@ import Dengage
 @objc(DengageCR)
 public class DengageCR : CDVPlugin {
 
-    @objc(setupDengage:launchOptions:application:askNotificaionPermission:)
-    public func setupDengage(key:NSString, launchOptions:NSDictionary?, application : UIApplication,askNotificaionPermission:DarwinBoolean) {
+    @objc(setupDengage:launchOptions:application:askNotificaionPermission:enableGeoFence:)
+    public func setupDengage(key:NSString, launchOptions:NSDictionary?, application : UIApplication,askNotificaionPermission:DarwinBoolean,enableGeoFence:DarwinBoolean) {
         Dengage.setIntegrationKey(key: key as String)
         if (launchOptions != nil) {
             Dengage.initWithLaunchOptions(application: application, withLaunchOptions: launchOptions as! [UIApplication.LaunchOptionsKey : Any])
@@ -19,7 +19,11 @@ public class DengageCR : CDVPlugin {
 
         }
         
-        //registerNotification(<#T##CDVInvokedUrlCommand#>)
+        if enableGeoFence.boolValue
+        {
+            Dengage.requestLocationPermissions()
+
+        }
         
         
     }
@@ -690,4 +694,28 @@ public class DengageCR : CDVPlugin {
             self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
 
         }
+    
+    @objc
+     func stopGeofence(_ command: CDVInvokedUrlCommand){
+         Dengage.stopGeofence()
+         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+     }
+     
+     @objc
+     func requestLocationPermissions(_ command: CDVInvokedUrlCommand){
+         Dengage.requestLocationPermissions()
+         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+     }
+     
+     @objc
+     func startGeofence(_ command: CDVInvokedUrlCommand){
+         Dengage.requestLocationPermissions()
+         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+     }
 }
