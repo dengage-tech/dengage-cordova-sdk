@@ -54,10 +54,9 @@ public class DengageCR extends CordovaPlugin {
         if (action.equals("setupDengage")) {
             boolean logStatus = Boolean.parseBoolean(args.getString(0));
             String firebaseKey = args.getString(1);
-            String huaweiKey = args.getString(2);
-            boolean geofenceStatus = args.getBoolean(3);
+            boolean geofenceStatus = args.getBoolean(2);
 
-            this.setupDengage(logStatus, firebaseKey, huaweiKey,geofenceStatus,context,callbackContext);
+            this.setupDengage(logStatus, firebaseKey,geofenceStatus,context,callbackContext);
      
             return true;
         }
@@ -84,12 +83,6 @@ public class DengageCR extends CordovaPlugin {
         if (action.equals("setPermission")) {
             boolean permission = Boolean.parseBoolean(args.getString(0));
             this.setPermission(permission, callbackContext);
-            return true;
-        }
-
-        if (action.equals("setHuaweiIntegrationKey")) {
-            String key = args.getString(0);
-            this.setHuaweiIntegrationKey(key, callbackContext);
             return true;
         }
 
@@ -301,7 +294,7 @@ public class DengageCR extends CordovaPlugin {
         return false;
     }
 
-        public void setupDengage(boolean logStatus, String firebaseKey, String huaweiKey,boolean geofenceStatus, Context context, CallbackContext callbackContext) {
+        public void setupDengage(boolean logStatus, String firebaseKey,boolean geofenceStatus, Context context, CallbackContext callbackContext) {
         try {
             this.context = context;
             this.manager = DengageManager.getInstance(this.context);
@@ -313,20 +306,7 @@ public class DengageCR extends CordovaPlugin {
                         .setFirebaseIntegrationKey(firebaseKey)
                         .setGeofenceStatus(geofenceStatus)
                         .init();
-            } else if (!this.isEmptyOrNull(huaweiKey)) {
-                this.manager
-                        .setLogStatus(logStatus)
-                        .setHuaweiIntegrationKey(huaweiKey)
-                        .setGeofenceStatus(geofenceStatus)
-                        .init();
-            } else {
-                this.manager
-                        .setLogStatus(logStatus)
-                        .setHuaweiIntegrationKey(huaweiKey)
-                        .setFirebaseIntegrationKey(firebaseKey)
-                        .setGeofenceStatus(geofenceStatus)
-                        .init();
-            }
+            } 
 
             callbackContext.success();
         } catch (Exception e) {
@@ -401,15 +381,6 @@ public class DengageCR extends CordovaPlugin {
     private void setFirebaseIntegrationKey(String key, CallbackContext callbackContext) {
         try {
             this.manager.setFirebaseIntegrationKey(key);
-            callbackContext.success(key);
-        } catch (Exception e) {
-            callbackContext.error(e.getMessage());
-        }
-    }
-
-    private void setHuaweiIntegrationKey(String key, CallbackContext callbackContext) {
-        try {
-            this.manager.setHuaweiIntegrationKey(key);
             callbackContext.success(key);
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
