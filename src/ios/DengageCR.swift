@@ -718,4 +718,47 @@ public class DengageCR : CDVPlugin {
 
          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
      }
+
+        @objc
+        func setInAppLinkConfiguration(_ command: CDVInvokedUrlCommand) {
+            let deeplink: String = command.argument(at: 0) as! String? ?? ""
+
+
+            Dengage.inAppLinkConfiguration(deeplink: deeplink as String)
+
+            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+            self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+        }
+
+    @objc
+    func getLastPushPayload(_ command: CDVInvokedUrlCommand) {
+        let payload = Dengage.getLastPushPayload()
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: payload)
+
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func registerInAppLinkReceiver (_ command: CDVInvokedUrlCommand)-> Void {
+        Dengage.handleInAppDeeplink{ (inapplink) in
+          var response = [String:Any?]();
+         response["eventType"] = "INAPP_CLICK_LINK"
+            response["targetUrl"] = inapplink
+              //JSONSerialization.jsonObject(with: response)
+          var convertedString = ""
+          do {
+                  let data =  try JSONSerialization.data(withJSONObject: response, options: JSONSerialization.WritingOptions.prettyPrinted)
+              convertedString = String(data: data, encoding: String.Encoding.utf8) ?? ""
+                } catch let myJSONError {
+                    print(myJSONError)
+                }
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: convertedString)
+
+          pluginResult.setKeepCallbackAs(true)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+       }
+    }
 }

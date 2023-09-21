@@ -9,7 +9,7 @@ allprojects {
 }
 
 dependencies {
-      implementation 'com.github.dengage-tech:dengage-android-sdk:6.0.9.4'
+      implementation 'com.github.dengage-tech:dengage-android-sdk:6.0.41.4'
       // huawei
       
     implementation 'com.huawei.hms:push:6.3.0.304'
