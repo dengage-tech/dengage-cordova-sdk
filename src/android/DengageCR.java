@@ -17,7 +17,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.LinkedTreeMap;
-
+import com.dengage.sdk.inapp.InAppBroadcastReceiver;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -295,6 +295,23 @@ public class DengageCR extends CordovaPlugin {
 
         if (action.equals("startGeofence")) {
             this.startGeofence(callbackContext);
+            return true;
+        }
+
+        if (action.equals("getLastPushPayload")) {
+            this.getLastPushPayload(callbackContext);
+            return true;
+        }
+
+        if (action.equals("setInAppLinkConfiguration")) {
+            String deeplink = args.getString(0);
+
+            this.setInAppLinkConfiguration(deeplink,callbackContext);
+            return true;
+        }
+
+        if (action.equals("registerInAppLinkReceiver")) {
+            this.registerInAppLinkReceiver(callbackContext);
             return true;
         }
 
@@ -829,6 +846,42 @@ public class DengageCR extends CordovaPlugin {
             callbackContext.error(e.getMessage());
         }
     }
+
+    private void getLastPushPayload(CallbackContext callbackContext) {
+        try {
+            String payload =  Dengage.INSTANCE.getLastPushPayload();
+            if (!this.isEmptyOrNull(payload)) {
+                callbackContext.success(payload);
+                return;
+            }
+
+            callbackContext.error("unable to get payload.");
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setInAppLinkConfiguration(String deeplink, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.inAppLinkConfiguration(deeplink);
+            callbackContext.success(deeplink);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void registerInAppLinkReceiver(CallbackContext callbackContext) {
+        try {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("com.dengage.inapp.LINK_RETRIEVAL");
+
+            InAppReceiver inAppReceiver = new InAppReceiver(callbackContext);
+            context.registerReceiver(inAppReceiver, filter);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
 }
 
 class NotifReciever extends NotificationReceiver {
@@ -876,6 +929,35 @@ class NotifReciever extends NotificationReceiver {
                     break;
             }
         }
+    }
+
+
+}
+
+class InAppReceiver extends InAppBroadcastReceiver {
+    CallbackContext notifyCallbackContext = null;
+
+    InAppReceiver(CallbackContext notifyCallbackContext) {
+        this.notifyCallbackContext = notifyCallbackContext;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        try {
+            if (notifyCallbackContext != null) {
+                String json = new Gson().toJson(intent.getExtras().getString("targetUrl"));
+                JsonParser parser = new JsonParser();
+                JsonElement jsonElement = parser.parse(json);
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                jsonObject.addProperty("eventType", "INAPP_CLICK_LINK");
+
+
+                PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
+                result.setKeepCallback(true);
+                notifyCallbackContext.sendPluginResult(result);
+            }
+        }
+        catch (Exception e){}
     }
 
 
