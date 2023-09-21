@@ -22,7 +22,7 @@
         <preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="23.0.2"/>
         <preference name="ANDROID_FIREBASE_CORE_VERSION" default="20.1.2"/>
         <preference name="ANDROID_FIREBASE_FIREBASE_ANALYTICS" default="18.0.2"/>
-        <preference name="ANDROID_DENGAGE_SDK" default="6.0.10.1"/>
+        <preference name="ANDROID_DENGAGE_SDK" default="6.0.41.1"/>
 
         <framework src="src/android/build.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
@@ -44,7 +44,7 @@
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods>
-                <pod name="Dengage" spec="~> 5.15.1"/>
+                <pod name="Dengage" spec="~> 5.42.1"/>
             </pods>
         </podspec>
 
