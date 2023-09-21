@@ -118,6 +118,15 @@ var DengageCR = {
     setPartnerDeviceId: function (adid,  success, error) {
         exec(success, error, 'DengageCR', 'setPartnerDeviceId', [adid])
     },
+    getLastPushPayload: function (success, error) {
+        exec(success, error, 'DengageCR', 'getLastPushPayload', [])
+    },
+    setInAppLinkConfiguration: function (deeplink, success, error) {
+        exec(success, error, 'DengageCR', 'setInAppLinkConfiguration', [deeplink])
+    },
+    registerInAppLinkReceiver: function (success, error) {
+        exec(success, error, 'DengageCR', 'registerInAppLinkReceiver', [])
+    },
     
 };
 
