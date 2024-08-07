@@ -22,7 +22,7 @@
         <preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="23.3.1"/>
         <preference name="ANDROID_FIREBASE_CORE_VERSION" default="21.1.1"/>
         <preference name="ANDROID_FIREBASE_FIREBASE_ANALYTICS" default="18.0.2"/>
-        <preference name="ANDROID_DENGAGE_SDK" default="6.0.63.2"/>
+        <preference name="ANDROID_DENGAGE_SDK" default="6.0.63.2.2"/>
 
         <framework src="src/android/build.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>

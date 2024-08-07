@@ -9,6 +9,6 @@ allprojects {
 }
 
 dependencies {
-      implementation 'com.github.dengage-tech:dengage-android-sdk:6.0.63.2'
+      implementation 'com.github.dengage-tech:dengage-android-sdk:6.0.63.2.2'
         
 }
