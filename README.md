@@ -121,7 +121,7 @@ Following is the sample code as an example for `Subscription/Event Api Endpoint`
 <details>
   <summary> iOS </summary>
 
-D·engage Mobile SDK for IOS supports version IOS 10 and later.
+D·engage Mobile SDK for IOS supports version IOS 11 and later.
 </details>
 
 <details>
