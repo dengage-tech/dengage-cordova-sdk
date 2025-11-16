@@ -1,8 +1,31 @@
 import Foundation
-import Dengage_Framework
+import Dengage
 
-@objc(Dengage)
-public class Dengage : CDVPlugin {
+@objc(DengageCR)
+public class DengageCR : CDVPlugin {
+
+    @objc(setupDengage:launchOptions:application:askNotificaionPermission:)
+    public func setupDengage(key:NSString, launchOptions:NSDictionary?, application : UIApplication,askNotificaionPermission:DarwinBoolean) {
+        Dengage.setIntegrationKey(key: key as String)
+        if (launchOptions != nil) {
+            Dengage.initWithLaunchOptions(application: application, withLaunchOptions: launchOptions as! [UIApplication.LaunchOptionsKey : Any])
+        } else {
+            Dengage.initWithLaunchOptions(application: application, withLaunchOptions: [:])
+        }
+          
+        if askNotificaionPermission.boolValue
+        {
+            Dengage.promptForPushNotifications()
+
+        }
+        
+        //registerNotification(<#T##CDVInvokedUrlCommand#>)
+        
+        
+    }
+
+    
+    
     @objc(registerForPushToken:)
     public func registerForPushToken(deviceToken: Data) {
         var token = "";
@@ -13,38 +36,33 @@ public class Dengage : CDVPlugin {
             let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
             token = tokenParts.joined()
         }
-        sendToken(token)
+        //sendToken(token)
+        
+        Dengage.register(deviceToken: deviceToken)
     }
+    
+    
+    @objc(didReceivePush:response:withCompletionHandler:)
+    public func didReceivePush(_ center: UNUserNotificationCenter,
+                                            _ response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping () -> Void) {
 
+        Dengage.didReceivePush(center, response, withCompletionHandler: completionHandler)
 
-    @objc
-    func setupDengage(_ command: CDVInvokedUrlCommand) {
-        let isVisible = command.argument(at: 0) as! Bool ?? false
-        let key = command.argument(at: 1) as! String? ?? ""
-        let launchOptions = command.argument(at: 2) as! NSDictionary?
-
-        Dengage_Framework.Dengage.setIntegrationKey(key: key as String)
-
-        if (launchOptions != nil) {
-            Dengage_Framework.Dengage.initWithLaunchOptions(withLaunchOptions: launchOptions as! [UIApplication.LaunchOptionsKey : Any])
-        } else {
-            Dengage_Framework.Dengage.initWithLaunchOptions(withLaunchOptions: nil)
-        }
-
-        Dengage_Framework.Dengage.promptForPushNotifications()
-
-        Dengage_Framework.Dengage.setLogStatus(isVisible: isVisible)
-
-        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
-
-        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
     }
-
+    
+    @objc(didReceive:)
+    public func didReceive(with userInfo: [AnyHashable: Any]) {
+        
+        Dengage.didReceive(with: userInfo)
+        
+    }
+    
     @objc
     func setIntegrationKey(_ command: CDVInvokedUrlCommand) -> Void {
         let key: String = command.argument(at: 0) as! String? ?? ""
 
-        Dengage_Framework.Dengage.setIntegrationKey(key: key)
+        Dengage.setIntegrationKey(key: key)
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -53,7 +71,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func promptForPushNotifications(_ command: CDVInvokedUrlCommand) {
-        Dengage_Framework.Dengage.promptForPushNotifications()
+        Dengage.promptForPushNotifications()
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -63,14 +81,14 @@ public class Dengage : CDVPlugin {
 
     @objc
     func promptForPushNotificationsWithCallback(_ command: CDVInvokedUrlCommand) {
-        Dengage_Framework.Dengage.promptForPushNotifications() {
+        Dengage.promptForPushNotifications() {
             hasPermission in self.commandDelegate.send(CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: hasPermission), callbackId: command.callbackId)
         }
     }
 
     @objc
     func setPermission(permission: Bool) {
-        Dengage_Framework.Dengage.setUserPermission(permission: permission)
+        Dengage.setUserPermission(permission: permission)
     }
 
 
@@ -78,7 +96,7 @@ public class Dengage : CDVPlugin {
     func setContactKey(_ command: CDVInvokedUrlCommand) {
         let contactKey: String = command.argument(at: 0) as! String? ?? ""
 
-        Dengage_Framework.Dengage.setContactKey(contactKey: contactKey)
+        Dengage.setContactKey(contactKey: contactKey)
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: contactKey)
 
@@ -89,7 +107,7 @@ public class Dengage : CDVPlugin {
     func setLogStatus(_ command: CDVInvokedUrlCommand) {
         let isVisible = command.argument(at: 0) as! Bool ?? false
 
-        Dengage_Framework.Dengage.setLogStatus(isVisible: isVisible)
+        Dengage.setLogStatus(isVisible: isVisible)
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -100,7 +118,7 @@ public class Dengage : CDVPlugin {
     func setMobilePushToken(_ command: CDVInvokedUrlCommand) {
         let token: String = command.argument(at: 0) as! String ?? ""
 
-        Dengage_Framework.Dengage.setToken(token: token)
+        Dengage.setToken(token: token)
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: token)
 
@@ -110,7 +128,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func getContactKey(_ command: CDVInvokedUrlCommand) {
-        let contactKey = Dengage_Framework.Dengage.getContactKey()
+        let contactKey = Dengage.getContactKey()
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: contactKey)
 
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
@@ -119,7 +137,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func getMobilePushToken(_ command: CDVInvokedUrlCommand) {
-        let token = Dengage_Framework.Dengage.getToken()
+        let token = Dengage.getDeviceToken()
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: token)
 
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
@@ -130,7 +148,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.pageView(params: data as! NSMutableDictionary)
+            try Dengage.pageView(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -148,7 +166,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.addToCart(params: data as! NSMutableDictionary)
+            try Dengage.addToCart(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -166,7 +184,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.removeFromCart(params: data as! NSMutableDictionary)
+            try Dengage.removeFromCart(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -184,7 +202,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.viewCart(params: data as! NSMutableDictionary)
+            try Dengage.viewCart(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -202,7 +220,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.beginCheckout(params: data as! NSMutableDictionary)
+            try Dengage.beginCheckout(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -220,7 +238,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.order(params: data as! NSMutableDictionary)
+            try Dengage.order(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -238,7 +256,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.cancelOrder(params: data as! NSMutableDictionary)
+            try Dengage.cancelOrder(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -256,7 +274,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.addToWithList(params: data as! NSMutableDictionary)
+            try Dengage.addToWithList(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -274,7 +292,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.removeFromWithList(params: data as! NSMutableDictionary)
+            try Dengage.removeFromWithList(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -292,7 +310,7 @@ public class Dengage : CDVPlugin {
         do {
             let data: NSDictionary = command.argument(at: 0) as! NSDictionary
 
-            try DengageEvent.shared.search(params: data as! NSMutableDictionary)
+            try Dengage.search(parameters: data as! [String:Any])
 
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -311,8 +329,8 @@ public class Dengage : CDVPlugin {
             let tableName: String = command.argument(at: 0) as! String
             let withData: NSDictionary = command.argument(at: 1) as! NSDictionary
 
-            try Dengage_Framework.Dengage.SendDeviceEvent(toEventTable: tableName, andWithEventDetails: withData as! NSMutableDictionary)
-
+            try Dengage.sendCustomEvent(eventTable: tableName as String, parameters: withData as! [String:Any])
+     
             let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
             self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
@@ -339,7 +357,7 @@ public class Dengage : CDVPlugin {
         let limit: Int = command.argument(at: 1) as? Int ?? 20
 
 
-        Dengage_Framework.Dengage.getInboxMessages(offset: offset, limit: limit) { (result) in
+        Dengage.getInboxMessages(offset: offset, limit: limit) { (result) in
             switch result {
             case .success(let resultType):
                 do {
@@ -371,7 +389,7 @@ public class Dengage : CDVPlugin {
         let id: String = command.argument(at: 0) as! String
 
 
-        Dengage_Framework.Dengage.deleteInboxMessage(with: id as String) { (result) in
+        Dengage.deleteInboxMessage(with: id as String) { (result) in
             switch result {
             case .success:
                 let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: ["success": true, "id": id])
@@ -392,7 +410,7 @@ public class Dengage : CDVPlugin {
         let id: String = command.argument(at: 0) as! String
 
 
-        Dengage_Framework.Dengage.setInboxMessageAsClicked(with: id as String) { (result) in
+        Dengage.setInboxMessageAsClicked(with: id as String) { (result) in
             switch result {
             case .success:
                 let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: ["success": true, "id": id])
@@ -411,7 +429,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func handleNotificationActionBlock (_ command: CDVInvokedUrlCommand) {
-        Dengage_Framework.Dengage.handleNotificationActionBlock { (notificationResponse) in
+        Dengage.handleNotificationActionBlock { (notificationResponse) in
             var response = [String:Any?]();
             response["actionIdentifier"] = notificationResponse.actionIdentifier
 
@@ -467,7 +485,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func setNavigation (_ command: CDVInvokedUrlCommand) -> Void {
-        Dengage_Framework.Dengage.setNavigation()
+        Dengage.setNavigation()
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
@@ -479,9 +497,9 @@ public class Dengage : CDVPlugin {
         let screenName: String = command.argument(at: 0) as! String? ?? ""
 
         if (screenName == "") {
-            Dengage_Framework.Dengage.setNavigation()
+            Dengage.setNavigation()
         } else {
-            Dengage_Framework.Dengage.setNavigation(screenName: screenName as String)
+            Dengage.setNavigation(screenName: screenName as String)
         }
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
@@ -493,7 +511,7 @@ public class Dengage : CDVPlugin {
 
     @objc
     func registerNotification (_ command: CDVInvokedUrlCommand)-> Void {
-      Dengage_Framework.Dengage.handleNotificationActionBlock { (notificationResponse) in
+      Dengage.handleNotificationActionBlock { (notificationResponse) in
           var response = [String:Any?]();
           response["actionIdentifier"] = notificationResponse.actionIdentifier
 
@@ -541,15 +559,21 @@ public class Dengage : CDVPlugin {
           response["notification"] = notification
 
           response["eventType"] = "PUSH_OPEN"
-
-          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: response)
+              //JSONSerialization.jsonObject(with: response)
+          var convertedString = ""
+          do {
+                  let data =  try JSONSerialization.data(withJSONObject: response, options: JSONSerialization.WritingOptions.prettyPrinted)
+              convertedString = String(data: data, encoding: String.Encoding.utf8) ?? ""
+                } catch let myJSONError {
+                    print(myJSONError)
+                }
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: convertedString)
 
           pluginResult.setKeepCallbackAs(true)
 
           self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
        }
     }
-
     @objc
     func setTags(_ command: CDVInvokedUrlCommand) -> Void {
         let data = command.argument(at: 0) as! [NSDictionary]
@@ -566,7 +590,7 @@ public class Dengage : CDVPlugin {
             )
             tags.append(tagItem)
         }
-        Dengage_Framework.Dengage.setTags(tags)
+        Dengage.setTags(tags)
 
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
 
@@ -574,6 +598,138 @@ public class Dengage : CDVPlugin {
     }
 
     private func sendToken(_ token: String ){
-        Dengage_Framework.Dengage.setToken(token: token)
+        Dengage.setToken(token: token)
+    }
+    
+    @objc
+      func setCategoryPath(_ command: CDVInvokedUrlCommand) {
+          let path: String = command.argument(at: 0) as! String? ?? ""
+
+          Dengage.setCategory(path: path as String)
+          
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+      }
+      
+    @objc
+      func setCartItemCount(_ command: CDVInvokedUrlCommand) {
+          let count: String = command.argument(at: 0) as! String? ?? ""
+
+          Dengage.setCart(itemCount: count as String)
+          
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+      }
+      
+    @objc
+      func setCartAmount(_ command: CDVInvokedUrlCommand) {
+          let amount: String = command.argument(at: 0) as! String? ?? ""
+
+          Dengage.setCart(amount: amount as String)
+          
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+      }
+      
+    @objc
+      func setState(_ command: CDVInvokedUrlCommand) {
+          let state: String = command.argument(at: 0) as! String? ?? ""
+
+          Dengage.setState(name: state as String)
+          
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+      }
+      
+    @objc
+      func setCity(_ command: CDVInvokedUrlCommand) {
+          let city: String = command.argument(at: 0) as! String? ?? ""
+
+          Dengage.setCity(name: city as String)
+          
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+      }
+      
+    @objc
+      func showRealTimeInApp (_ command: CDVInvokedUrlCommand) -> Void {
+          do {
+              let screenName: String = command.argument(at: 0) as! String
+              let withData: NSDictionary = command.argument(at: 1) as! NSDictionary
+
+              Dengage.showRealTimeInApp(screenName: screenName as String , params: withData as? Dictionary<String, String> )
+              
+              let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+              self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+          } catch {
+              print("Unexpected search error: \(error)")
+          }
+      }
+    
+    @objc
+        func setPartnerDeviceId(_ command: CDVInvokedUrlCommand) {
+            let adid: String = command.argument(at: 0) as! String
+          
+            Dengage.setPartnerDeviceId(adid: adid as String)
+            
+            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+            self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+        }
+
+          @objc
+        func setInAppLinkConfiguration(_ command: CDVInvokedUrlCommand) {
+            let deeplink: String = command.argument(at: 0) as! String? ?? ""
+
+
+            Dengage.inAppLinkConfiguration(deeplink: deeplink as String)
+
+            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+
+            self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+
+        }
+
+    @objc
+    func getLastPushPayload(_ command: CDVInvokedUrlCommand) {
+        let payload = Dengage.getLastPushPayload()
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: payload)
+
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func registerInAppLinkReceiver (_ command: CDVInvokedUrlCommand)-> Void {
+        Dengage.handleInAppDeeplink{ (inapplink) in
+          var response = [String:Any?]();
+         response["eventType"] = "INAPP_CLICK_LINK"
+            response["targetUrl"] = inapplink
+              //JSONSerialization.jsonObject(with: response)
+          var convertedString = ""
+          do {
+                  let data =  try JSONSerialization.data(withJSONObject: response, options: JSONSerialization.WritingOptions.prettyPrinted)
+              convertedString = String(data: data, encoding: String.Encoding.utf8) ?? ""
+                } catch let myJSONError {
+                    print(myJSONError)
+                }
+          let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: convertedString)
+
+          pluginResult.setKeepCallbackAs(true)
+
+          self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+       }
     }
 }

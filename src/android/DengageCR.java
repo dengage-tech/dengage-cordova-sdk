@@ -1,15 +1,18 @@
+
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
-import com.dengage.sdk.DengageEvent;
+import com.dengage.sdk.Dengage;
 import com.dengage.sdk.DengageManager;
-import com.dengage.sdk.NotificationReceiver;
 import com.dengage.sdk.callback.DengageCallback;
-import com.dengage.sdk.models.DengageError;
-import com.dengage.sdk.models.Message;
-import com.dengage.sdk.models.TagItem;
+import com.dengage.sdk.callback.DengageError;
+import com.dengage.sdk.domain.push.model.Message;
+import com.dengage.sdk.domain.tag.model.TagItem;
+import com.dengage.sdk.inapp.InAppBroadcastReceiver;
+import com.dengage.sdk.push.NotificationReceiver;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,7 +37,8 @@ import java.util.List;
 /**
  * This class Dengage functions called from JavaScript.
  */
-public class Dengage extends CordovaPlugin {
+public class DengageCR extends CordovaPlugin {
+
     DengageManager manager = null;
     Context context = null;
 
@@ -51,9 +55,8 @@ public class Dengage extends CordovaPlugin {
         if (action.equals("setupDengage")) {
             boolean logStatus = Boolean.parseBoolean(args.getString(0));
             String firebaseKey = args.getString(1);
-            String huaweiKey = args.getString(2);
 
-            this.setupDengage(logStatus, firebaseKey, huaweiKey, callbackContext);
+            this.setupDengage(logStatus, firebaseKey,context, callbackContext);
             return true;
         }
 
@@ -82,11 +85,7 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
-        if (action.equals("setHuaweiIntegrationKey")) {
-            String key = args.getString(0);
-            this.setHuaweiIntegrationKey(key, callbackContext);
-            return true;
-        }
+
 
         if (action.equals("setFirebaseIntegrationKey")) {
             String key = args.getString(0);
@@ -223,33 +222,93 @@ public class Dengage extends CordovaPlugin {
             return true;
         }
 
+
+        if (action.equals("showRealTimeInApp")) {
+            String screenName = args.getString(0);
+            JSONObject data = new JSONObject(args.getString(1));
+
+            this.showRealTimeInApp(screenName,data,callbackContext);
+            return true;
+        }
+
+
+        if (action.equals("setCity")) {
+            String city = args.getString(0);
+
+            this.setCity(city,callbackContext);
+            return true;
+        }
+
+
+        if (action.equals("setState")) {
+            String state = args.getString(0);
+
+            this.setState(state,callbackContext);
+            return true;
+        }
+
+
+        if (action.equals("setCartAmount")) {
+            String amount = args.getString(0);
+
+            this.setCartAmount(amount,callbackContext);
+            return true;
+        }
+
+
+        if (action.equals("setCartItemCount")) {
+            String itemCount = args.getString(0);
+
+            this.setCartItemCount(itemCount,callbackContext);
+            return true;
+        }
+
+        if (action.equals("setCategoryPath")) {
+            String path = args.getString(0);
+
+            this.setCategoryPath(path,callbackContext);
+            return true;
+        }
+
+        if (action.equals("setPartnerDeviceId")) {
+            String adid = args.getString(0);
+
+            this.setPartnerDeviceId(adid,callbackContext);
+            return true;
+        }
+
+        if (action.equals("getLastPushPayload")) {
+            this.getLastPushPayload(callbackContext);
+            return true;
+        }
+
+        if (action.equals("setInAppLinkConfiguration")) {
+            String deeplink = args.getString(0);
+
+            this.setInAppLinkConfiguration(deeplink,callbackContext);
+            return true;
+        }
+
+        if (action.equals("registerInAppLinkReceiver")) {
+            this.registerInAppLinkReceiver(callbackContext);
+            return true;
+        }
+
         return false;
     }
 
-    private void setupDengage(boolean logStatus, String firebaseKey, String huaweiKey, CallbackContext callbackContext) {
+        public void setupDengage(boolean logStatus, String firebaseKey, Context context,CallbackContext callbackContext) {
         try {
-            if (this.isEmptyOrNull(firebaseKey) && this.isEmptyOrNull(huaweiKey)) {
-                callbackContext.error("Both firebase key and huawei key can't be null at the same time.");
-                return;
-            }
+            this.context = context;
+            this.manager = DengageManager.getInstance(this.context);
+
 
             if (!this.isEmptyOrNull(firebaseKey)) {
                 this.manager
                         .setLogStatus(logStatus)
                         .setFirebaseIntegrationKey(firebaseKey)
                         .init();
-            } else if (!this.isEmptyOrNull(huaweiKey)) {
-                this.manager
-                        .setLogStatus(logStatus)
-                        .setHuaweiIntegrationKey(huaweiKey)
-                        .init();
-            } else {
-                this.manager
-                        .setLogStatus(logStatus)
-                        .setHuaweiIntegrationKey(huaweiKey)
-                        .setFirebaseIntegrationKey(firebaseKey)
-                        .init();
-            }
+            }  
 
             callbackContext.success();
         } catch (Exception e) {
@@ -329,14 +388,7 @@ public class Dengage extends CordovaPlugin {
         }
     }
 
-    private void setHuaweiIntegrationKey(String key, CallbackContext callbackContext) {
-        try {
-            this.manager.setHuaweiIntegrationKey(key);
-            callbackContext.success(key);
-        } catch (Exception e) {
-            callbackContext.error(e.getMessage());
-        }
-    }
+
 
     private void getMobilePushToken(CallbackContext callbackContext) {
         try {
@@ -398,7 +450,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).pageView(map);
+            com.dengage.sdk.Dengage.INSTANCE.pageView(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -410,7 +462,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).addToCart(map);
+            com.dengage.sdk.Dengage.INSTANCE.addToCart(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -422,7 +474,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).removeFromCart(map);
+            com.dengage.sdk.Dengage.INSTANCE.removeFromCart(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -434,7 +486,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).viewCart(map);
+            com.dengage.sdk.Dengage.INSTANCE.viewCart(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -446,7 +498,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).beginCheckout(map);
+            com.dengage.sdk.Dengage.INSTANCE.beginCheckout(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -458,7 +510,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).order(map);
+            com.dengage.sdk.Dengage.INSTANCE.order(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -470,7 +522,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).cancelOrder(map);
+            com.dengage.sdk.Dengage.INSTANCE.cancelOrder(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -482,7 +534,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).addToWishList(map);
+            com.dengage.sdk.Dengage.INSTANCE.addToWishList(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -494,7 +546,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).removeFromWishList(map);
+            com.dengage.sdk.Dengage.INSTANCE.removeFromWishList(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -506,7 +558,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).search(map);
+            com.dengage.sdk.Dengage.INSTANCE.search(map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -518,7 +570,7 @@ public class Dengage extends CordovaPlugin {
         try {
             HashMap<String, Object> map = new Gson().fromJson(data.toString(), HashMap.class);
 
-            DengageEvent.getInstance(this.context).sendDeviceEvent(tableName, map);
+            com.dengage.sdk.Dengage.INSTANCE.sendDeviceEvent(tableName, map,context);
 
             callbackContext.success();
         } catch (Exception e) {
@@ -620,6 +672,139 @@ public class Dengage extends CordovaPlugin {
 
         return false;
     }
+    private void  setPartnerDeviceId(String adid ,CallbackContext callbackContext)
+    {
+        try {
+            Dengage.INSTANCE.setPartnerDeviceId(adid);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Set category path for using in real time in app comparisons
+     */
+    private void setCategoryPath(String path,CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setCategoryPath(path);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Set cart item count for using in real time in app comparisons
+     */
+    private void setCartItemCount( String count,CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setCartItemCount(count);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Set cart amount for using in real time in app comparisons
+     */
+    private void setCartAmount(String amount,CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setCartAmount(amount);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Set state for using in real time in app comparisons
+     */
+    private void setState(String state,CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setState(state);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Set city for using in real time in app comparisons
+     */
+    private void setCity(String city,CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setCity(city);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void showRealTimeInApp(
+
+            String screenName,
+            JSONObject data,CallbackContext callbackContext
+    ) {
+        try {
+            HashMap<String, String> map = new Gson().fromJson(data.toString(), HashMap.class);
+
+            Dengage.INSTANCE.showRealTimeInApp(this.cordova.getActivity(), screenName, map, -1);
+            callbackContext.success();
+        }
+        catch (Exception e)
+        {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void getLastPushPayload(CallbackContext callbackContext) {
+        try {
+            String payload =  Dengage.INSTANCE.getLastPushPayload();
+            if (!this.isEmptyOrNull(payload)) {
+                callbackContext.success(payload);
+                return;
+            }
+
+            callbackContext.error("unable to get payload.");
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setInAppLinkConfiguration(String deeplink, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.inAppLinkConfiguration(deeplink);
+            callbackContext.success(deeplink);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void registerInAppLinkReceiver(CallbackContext callbackContext) {
+        try {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("com.dengage.inapp.LINK_RETRIEVAL");
+
+            InAppReceiver inAppReceiver = new InAppReceiver(callbackContext);
+            context.registerReceiver(inAppReceiver, filter);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
 }
 
 class NotifReciever extends NotificationReceiver {
@@ -637,8 +822,8 @@ class NotifReciever extends NotificationReceiver {
                 case -825236177:
                     if (intentAction.equals("com.dengage.push.intent.RECEIVE")) {
                         Bundle val = intent.getExtras();
-                        Message message = val != null ? new Message(val) : null;
-                        String json = message.toJson();
+                        Message message = val != null ? Message.Companion.createFromIntent(val) : null;
+                        String json = new Gson().toJson(message);
                         JsonParser parser = new JsonParser();
                         JsonElement jsonElement = parser.parse(json);
                         JsonObject jsonObject = jsonElement.getAsJsonObject();
@@ -653,8 +838,8 @@ class NotifReciever extends NotificationReceiver {
                 case -520704162:
                     if (intentAction.equals("com.dengage.push.intent.OPEN")) {
                         Bundle val = intent.getExtras();
-                        Message message = val != null ? new Message(val) : null;
-                        String json = message.toJson();
+                        Message message = val != null ? Message.Companion.createFromIntent(val) : null;
+                        String json = new Gson().toJson(message);
                         JsonParser parser = new JsonParser();
                         JsonElement jsonElement = parser.parse(json);
                         JsonObject jsonObject = jsonElement.getAsJsonObject();
@@ -668,4 +853,35 @@ class NotifReciever extends NotificationReceiver {
             }
         }
     }
+
+
+}
+
+class InAppReceiver extends InAppBroadcastReceiver {
+    CallbackContext notifyCallbackContext = null;
+
+    InAppReceiver(CallbackContext notifyCallbackContext) {
+        this.notifyCallbackContext = notifyCallbackContext;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        try {
+            if (notifyCallbackContext != null) {
+                String json = new Gson().toJson(intent.getExtras().getString("targetUrl"));
+                JsonParser parser = new JsonParser();
+                JsonElement jsonElement = parser.parse(json);
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                jsonObject.addProperty("eventType", "INAPP_CLICK_LINK");
+
+
+                PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
+                result.setKeepCallback(true);
+                notifyCallbackContext.sendPluginResult(result);
+            }
+        }
+        catch (Exception e){}
+    }
+
+
 }
