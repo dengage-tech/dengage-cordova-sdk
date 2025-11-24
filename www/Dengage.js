@@ -1,15 +1,6 @@
 var exec = require('cordova/exec');
 
 var DengageCR = {
-    setupDengage: function (logStatus, firebaseKey, success, error) {
-        exec(success, error, 'DengageCR', 'setupDengage', [logStatus, firebaseKey]);
-    },
-    setHuaweiIntegrationKey: function (key, success, error) {
-        exec(success, error, 'DengageCR', 'setHuaweiIntegrationKey', [key])
-    },
-    setFirebaseIntegrationKey: function (key, success, error) {
-        exec(success, error, 'DengageCR', 'setFirebaseIntegrationKey', [key])
-    },
     setContactKey: function (contactKey, success, error) {
         exec(success, error, 'DengageCR', 'setContactKey', [contactKey])
     },
@@ -126,6 +117,83 @@ var DengageCR = {
     },
     registerInAppLinkReceiver: function (success, error) {
         exec(success, error, 'DengageCR', 'registerInAppLinkReceiver', [])
+    },
+    
+    // New methods matching React Native SDK
+    sendCustomEvent: function (eventTable, key, parameters, success, error) {
+        exec(success, error, 'DengageCR', 'sendCustomEvent', [eventTable, key, parameters])
+    },
+    
+    setCart: function (cart, success, error) {
+        exec(success, error, 'DengageCR', 'setCart', [cart])
+    },
+    
+    getCart: function (success, error) {
+        exec(success, error, 'DengageCR', 'getCart', [])
+    },
+    
+    getSdkParameters: function (success, error) {
+        exec(success, error, 'DengageCR', 'getSdkParameters', [])
+    },
+    
+    setInAppDeviceInfo: function (key, value, success, error) {
+        exec(success, error, 'DengageCR', 'setInAppDeviceInfo', [key, value])
+    },
+    
+    clearInAppDeviceInfo: function (success, error) {
+        exec(success, error, 'DengageCR', 'clearInAppDeviceInfo', [])
+    },
+    
+    getInAppDeviceInfo: function (success, error) {
+        exec(success, error, 'DengageCR', 'getInAppDeviceInfo', [])
+    },
+    
+    deleteAllInboxMessages: function (success, error) {
+        exec(success, error, 'DengageCR', 'deleteAllInboxMessages', [])
+    },
+    
+    setAllInboxMessageAsClicked: function (success, error) {
+        exec(success, error, 'DengageCR', 'setAllInboxMessageAsClicked', [])
+    },
+    
+    getDeviceId: function (success, error) {
+        exec(success, error, 'DengageCR', 'getDeviceId', [])
+    },
+    
+    setDeviceId: function (deviceId, success, error) {
+        exec(success, error, 'DengageCR', 'setDeviceId', [deviceId])
+    },
+    
+    setLanguage: function (language, success, error) {
+        exec(success, error, 'DengageCR', 'setLanguage', [language])
+    },
+    
+    setDevelopmentStatus: function (isDebug, success, error) {
+        exec(success, error, 'DengageCR', 'setDevelopmentStatus', [isDebug])
+    },
+    
+    getSdkVersion: function (success, error) {
+        exec(success, error, 'DengageCR', 'getSdkVersion', [])
+    },
+    
+    requestLocationPermissions: function (success, error) {
+        exec(success, error, 'DengageCR', 'requestLocationPermissions', [])
+    },
+    
+    getIntegrationKey: function (success, error) {
+        exec(success, error, 'DengageCR', 'getIntegrationKey', [])
+    },
+    
+    getUserPermission: function (success, error) {
+        exec(success, error, 'DengageCR', 'getUserPermission', [])
+    },
+    
+    resetAppBadge: function (success, error) {
+        exec(success, error, 'DengageCR', 'resetAppBadge', [])
+    },
+    
+    setNavigationWithNameAndData: function (screenName, screenData, success, error) {
+        exec(success, error, 'DengageCR', 'setNavigationWithNameAndData', [screenName, screenData])
     },
     
 };

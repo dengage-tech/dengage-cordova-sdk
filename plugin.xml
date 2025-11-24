@@ -5,7 +5,7 @@
     <keywords>dengage,cordova-dengage</keywords>
     <repo>https://github.com/dengage-tech/dengage-cordova-sdk</repo>
     <issue>https://github.com/dengage-tech/dengage-cordova-sdk/issues</issue>
-    <js-module name="DengageCR" src="www/DengageCR.js">
+    <js-module name="DengageCR" src="www/Dengage.js">
         <clobbers target="DengageCR"/>
     </js-module>
     <platform name="android">
@@ -18,11 +18,12 @@
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"/>
         <source-file src="src/android/DengageCR.java" target-dir="src/DengageCR"/>
+        <source-file src="src/android/DengageCRCoordinator.java" target-dir="src/com/dengage/cordova/dengagecr"/>
 
         <preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="23.3.1"/>
         <preference name="ANDROID_FIREBASE_CORE_VERSION" default="21.1.1"/>
         <preference name="ANDROID_FIREBASE_FIREBASE_ANALYTICS" default="18.0.2"/>
-        <preference name="ANDROID_DENGAGE_SDK" default="6.0.63.2.2"/>
+        <preference name="ANDROID_DENGAGE_SDK" default="6.0.83"/>
 
         <framework src="src/android/build.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
@@ -44,12 +45,13 @@
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods>
-                <pod name="Dengage" spec="~> 5.66.1"/>
+                <pod name="Dengage" spec="~> 5.85"/>
             </pods>
         </podspec>
 
 
         <source-file src="src/ios/DengageCR.swift"/>
+        <source-file src="src/ios/DengageCRCoordinator.swift"/>
         <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
         <preference name="UseSwiftLanguageVersion" default="5" />
     </platform>
