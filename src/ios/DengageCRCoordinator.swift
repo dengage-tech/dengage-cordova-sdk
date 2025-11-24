@@ -31,7 +31,7 @@ public class DengageCRCoordinator: NSObject {
         )
         let opts = launchOptions as? [UIApplication.LaunchOptionsKey: Any] ?? [:]
         Dengage.start(apiKey: key as String, application: application, launchOptions: opts, dengageOptions: options)
-        
+        Dengage.setIntegrationKey(key: key as String)
         if askNotificationPermission.boolValue {
             Dengage.promptForPushNotifications()
         }
@@ -47,7 +47,7 @@ public class DengageCRCoordinator: NSObject {
     }
     
     @objc(registerForPushToken:)
-    public func registerForPushToken(deviceToken: Data) {
+    public func registerForPushToken(_ deviceToken: Data) {
         Dengage.register(deviceToken: deviceToken)
     }
     
@@ -65,5 +65,6 @@ public class DengageCRCoordinator: NSObject {
         Dengage.didReceive(with: userInfo)
     }
 }
+
 
 

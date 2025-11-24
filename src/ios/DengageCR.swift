@@ -22,8 +22,13 @@ public class DengageCR : CDVPlugin {
     }
 
     @objc
-    func setPermission(permission: Bool) {
+    func setPermission(_ command: CDVInvokedUrlCommand) {
+        let permission: Bool = command.argument(at: 0) as? Bool ?? false
+        
         Dengage.setUserPermission(permission: permission)
+        
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
     }
 
 
@@ -279,11 +284,38 @@ public class DengageCR : CDVPlugin {
 
     @objc
     func getSubscription (_ command: CDVInvokedUrlCommand) -> Void {
-
-        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_ERROR, messageAs: "This method is yet not available in iOS")
-
-        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
-
+        // Build subscription object similar to React Native implementation
+        var subscription: [String: Any] = [:]
+        
+        subscription["integrationKey"] = Dengage.getIntegrationKey()
+        subscription["token"] = Dengage.getDeviceToken() ?? ""
+        subscription["appVersion"] = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        subscription["sdkVersion"] = Dengage.getSdkVersion() ?? ""
+        subscription["deviceId"] = Dengage.getDeviceId()
+        subscription["advertisingId"] = "" // Not available in iOS without additional setup
+        subscription["carrierId"] = "" // Not directly available
+        subscription["contactKey"] = Dengage.getContactKey()
+        subscription["permission"] = Dengage.getPermission()
+        subscription["trackingPermission"] = false
+        subscription["tokenType"] = "I" // iOS
+        subscription["webSubscription"] = ""
+        subscription["testGroup"] = ""
+        subscription["country"] = "" // Can be added if needed
+        subscription["language"] = Locale.current.languageCode ?? ""
+        subscription["timezone"] = TimeZone.current.identifier
+        subscription["partnerDeviceId"] = "" // Can be retrieved if set
+        subscription["locationPermission"] = "" // Can be added if needed
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: subscription, options: [])
+            let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
+            
+            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: jsonString)
+            self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+        } catch {
+            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_ERROR, messageAs: error.localizedDescription)
+            self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+        }
     }
 
     @objc
@@ -791,7 +823,7 @@ public class DengageCR : CDVPlugin {
                     let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: paramsDict)
                     self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
                 } else {
-                    let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: NSNull())
+                    let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: [:])
                     self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
                 }
             } catch {
@@ -799,7 +831,7 @@ public class DengageCR : CDVPlugin {
                 self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
             }
         } else {
-            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: NSNull())
+            let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: [:])
             self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
         }
     }
@@ -924,7 +956,7 @@ public class DengageCR : CDVPlugin {
     }
 
     @objc
-    func getUserPermission (_ command: CDVInvokedUrlCommand) -> Void {
+    func getPermission (_ command: CDVInvokedUrlCommand) -> Void {
         let permission = Dengage.getPermission()
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: permission)
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
@@ -942,7 +974,7 @@ public class DengageCR : CDVPlugin {
         let screenName: String = command.argument(at: 0) as! String
         let screenData: NSDictionary = command.argument(at: 1) as! NSDictionary
         
-        Dengage.setNavigation(screenName: screenName, screenData: screenData as? Dictionary<String, String>)
+        Dengage.showRealTimeInApp(screenName: screenName, params: screenData as? Dictionary<String, String>)
         
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
