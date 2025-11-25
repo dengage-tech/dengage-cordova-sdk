@@ -106,6 +106,12 @@ var DengageCR = {
     showRealTimeInApp: function (screenName, data,  success, error) {
         exec(success, error, 'DengageCR', 'showRealTimeInApp', [screenName,data])
     },
+    showInAppInline: function (payload, success, error) {
+        exec(success, error, 'DengageCR', 'showInAppInline', [payload])
+    },
+    hideInAppInline: function (success, error) {
+        exec(success, error, 'DengageCR', 'hideInAppInline', [])
+    },
     setPartnerDeviceId: function (adid,  success, error) {
         exec(success, error, 'DengageCR', 'setPartnerDeviceId', [adid])
     },

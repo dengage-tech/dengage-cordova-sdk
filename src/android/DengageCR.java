@@ -1,10 +1,16 @@
+package com.dengage.cordova.dengagecr;
 
-
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import androidx.core.view.ViewCompat;
 
 import com.dengage.sdk.Dengage;
 import com.dengage.sdk.DengageManager;
@@ -33,6 +39,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +50,7 @@ public class DengageCR extends CordovaPlugin {
 
     Context context = null;
     DengageManager manager = null;
+    InAppInlineHostView inlineHostView = null;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -216,6 +224,20 @@ public class DengageCR extends CordovaPlugin {
             JSONObject data = new JSONObject(args.getString(1));
 
             this.showRealTimeInApp(screenName,data,callbackContext);
+            return true;
+        }
+
+        if (action.equals("showInAppInline")) {
+            JSONObject payload = args.optJSONObject(0);
+            if (payload == null && args.length() > 0) {
+                payload = new JSONObject(args.getString(0));
+            }
+            this.showInAppInline(payload, callbackContext);
+            return true;
+        }
+
+        if (action.equals("hideInAppInline")) {
+            this.hideInAppInline(callbackContext);
             return true;
         }
 
@@ -843,6 +865,123 @@ public class DengageCR extends CordovaPlugin {
         {
             callbackContext.error(e.getMessage());
         }
+    }
+
+    private void showInAppInline(JSONObject payload, CallbackContext callbackContext) {
+        try {
+            if (payload == null) {
+                callbackContext.error("payload is required");
+                return;
+            }
+
+            String propertyId = payload.optString("propertyId", "").trim();
+            String screenName = payload.optString("screenName", "").trim();
+            JSONObject customParamsJson = payload.optJSONObject("customParams");
+            JSONObject boundsJson = payload.optJSONObject("bounds");
+
+            if (propertyId.isEmpty() || screenName.isEmpty()) {
+                callbackContext.error("propertyId and screenName are required");
+                return;
+            }
+
+            Activity activity = this.cordova.getActivity();
+            if (activity == null) {
+                callbackContext.error("Activity is null");
+                return;
+            }
+
+            final Map<String, String> customParams = toStringMap(customParamsJson);
+            final JSONObject bounds = boundsJson;
+            final CallbackContext hostCallback = callbackContext;
+            final String finalPropertyId = propertyId;
+            final String finalScreenName = screenName;
+
+            activity.runOnUiThread(() -> {
+                ViewGroup root = activity.findViewById(android.R.id.content);
+                if (root == null) {
+                    hostCallback.error("Root view is not available");
+                    return;
+                }
+
+                if (inlineHostView != null) {
+                    ViewGroup parent = (ViewGroup) inlineHostView.getParent();
+                    if (parent != null) {
+                        parent.removeView(inlineHostView);
+                    }
+                    inlineHostView = null;
+                }
+
+                InAppInlineHostView hostView = new InAppInlineHostView(activity);
+                FrameLayout.LayoutParams layoutParams = buildLayoutParams(bounds, activity);
+
+                root.addView(hostView, layoutParams);
+                hostView.bringToFront();
+                hostView.setTranslationZ(9999f);
+                ViewCompat.setElevation(hostView, 9999f);
+
+                hostView.showInline(finalPropertyId, finalScreenName, customParams, activity);
+                inlineHostView = hostView;
+                hostCallback.success();
+            });
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void hideInAppInline(CallbackContext callbackContext) {
+        Activity activity = this.cordova.getActivity();
+        if (activity == null) {
+            callbackContext.error("Activity is null");
+            return;
+        }
+
+        activity.runOnUiThread(() -> {
+            ViewGroup root = activity.findViewById(android.R.id.content);
+            if (root != null && inlineHostView != null) {
+                root.removeView(inlineHostView);
+            }
+            inlineHostView = null;
+            callbackContext.success();
+        });
+    }
+
+    private FrameLayout.LayoutParams buildLayoutParams(JSONObject boundsJson, Activity activity) {
+        float density = activity.getResources().getDisplayMetrics().density;
+        int left = 0;
+        int top = 0;
+        int width = FrameLayout.LayoutParams.MATCH_PARENT;
+        int height = FrameLayout.LayoutParams.MATCH_PARENT;
+
+        if (boundsJson != null) {
+            left = (int) Math.max(0, Math.round(boundsJson.optDouble("left", 0) * density));
+            top = (int) Math.max(0, Math.round(boundsJson.optDouble("top", 0) * density));
+            if (boundsJson.has("width")) {
+                width = (int) Math.max(1, Math.round(boundsJson.optDouble("width", 0) * density));
+            }
+            if (boundsJson.has("height")) {
+                height = (int) Math.max(1, Math.round(boundsJson.optDouble("height", 0) * density));
+            }
+        }
+
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width, height);
+        layoutParams.leftMargin = left;
+        layoutParams.topMargin = top;
+        return layoutParams;
+    }
+
+    private Map<String, String> toStringMap(JSONObject object) {
+        if (object == null) {
+            return null;
+        }
+
+        Map<String, String> result = new HashMap<>();
+        Iterator<String> keys = object.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            result.put(key, object.optString(key, ""));
+        }
+
+        return result.isEmpty() ? null : result;
     }
 
     private void getLastPushPayload(CallbackContext callbackContext) {

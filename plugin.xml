@@ -11,13 +11,14 @@
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="DengageCR">
-                <param name="android-package" value="DengageCR"/>
+                <param name="android-package" value="com.dengage.cordova.dengagecr.DengageCR"/>
                 <param name="onload" value="true"/>
             </feature>
             <preference name="AndroidXEnabled" value="true"/>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"/>
-        <source-file src="src/android/DengageCR.java" target-dir="src/DengageCR"/>
+        <source-file src="src/android/DengageCR.java" target-dir="src/com/dengage/cordova/dengagecr"/>
+        <source-file src="src/android/InAppInlineHostView.java" target-dir="src/com/dengage/cordova/dengagecr"/>
         <source-file src="src/android/DengageCRCoordinator.java" target-dir="src/com/dengage/cordova/dengagecr"/>
 
         <preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="23.3.1"/>
@@ -51,6 +52,7 @@
 
 
         <source-file src="src/ios/DengageCR.swift"/>
+        <source-file src="src/ios/DengageInlineOverlayView.swift"/>
         <source-file src="src/ios/DengageCRCoordinator.swift"/>
         <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
         <preference name="UseSwiftLanguageVersion" default="5" />

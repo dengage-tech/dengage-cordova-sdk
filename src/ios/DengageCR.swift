@@ -1,8 +1,11 @@
+import UIKit
 import Foundation
 import Dengage
 
 @objc(DengageCR)
 public class DengageCR : CDVPlugin {
+
+    private var inlineOverlayView: DengageInlineOverlayView?
 
     @objc
     func promptForPushNotifications(_ command: CDVInvokedUrlCommand) {
@@ -644,6 +647,88 @@ public class DengageCR : CDVPlugin {
               print("Unexpected search error: \(error)")
           }
       }
+
+    @objc
+    func showInAppInline(_ command: CDVInvokedUrlCommand) {
+        guard let payload = command.argument(at: 0) as? [String: Any] else {
+            let result = CDVPluginResult(status: .error, messageAs: "payload is required")
+            self.commandDelegate.send(result, callbackId: command.callbackId)
+            return
+        }
+
+        let propertyId = (payload["propertyId"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let screenName = (payload["screenName"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let boundsDict = payload["bounds"] as? [String: Any]
+        let customParams = stringDictionary(from: payload["customParams"])
+
+        guard !propertyId.isEmpty, !screenName.isEmpty else {
+            let result = CDVPluginResult(status: .error, messageAs: "propertyId and screenName are required")
+            self.commandDelegate.send(result, callbackId: command.callbackId)
+            return
+        }
+
+        let inlineBounds = rectangle(from: boundsDict)
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard let container = self.webView?.superview ?? self.viewController?.view else {
+                let result = CDVPluginResult(status: .error, messageAs: "Unable to attach inline view")
+                self.commandDelegate.send(result, callbackId: command.callbackId)
+                return
+            }
+
+            self.inlineOverlayView?.removeFromSuperview()
+            let overlay = DengageInlineOverlayView()
+            overlay.configure(bounds: inlineBounds, propertyId: propertyId, screenName: screenName, customParams: customParams)
+            container.addSubview(overlay)
+            self.inlineOverlayView = overlay
+
+            let successResult = CDVPluginResult(status: .ok)
+            self.commandDelegate.send(successResult, callbackId: command.callbackId)
+        }
+    }
+
+    @objc
+    func hideInAppInline(_ command: CDVInvokedUrlCommand) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.inlineOverlayView?.removeFromSuperview()
+            self.inlineOverlayView = nil
+            let result = CDVPluginResult(status: .ok)
+            self.commandDelegate.send(result, callbackId: command.callbackId)
+        }
+    }
+
+    private func rectangle(from dict: [String: Any]?) -> CGRect {
+        if let dict = dict {
+            let left = CGFloat((dict["left"] as? NSNumber)?.doubleValue ?? 0)
+            let top = CGFloat((dict["top"] as? NSNumber)?.doubleValue ?? 0)
+            let width = CGFloat((dict["width"] as? NSNumber)?.doubleValue ?? 0)
+            let height = CGFloat((dict["height"] as? NSNumber)?.doubleValue ?? 0)
+            let resolvedWidth = width > 0 ? width : (self.webView?.bounds.width ?? 0)
+            let resolvedHeight = height > 0 ? height : (self.webView?.bounds.height ?? 0)
+            return CGRect(x: left, y: top, width: resolvedWidth, height: resolvedHeight)
+        }
+
+        if let bounds = self.webView?.bounds {
+            return bounds
+        }
+
+        return self.viewController?.view.bounds ?? .zero
+    }
+
+    private func stringDictionary(from value: Any?) -> [String: String]? {
+        guard let dict = value as? [String: Any] else {
+            return nil
+        }
+
+        var result: [String: String] = [:]
+        for (key, rawValue) in dict {
+            result[key] = "\(rawValue)"
+        }
+
+        return result.isEmpty ? nil : result
+    }
     
     @objc
         func setPartnerDeviceId(_ command: CDVInvokedUrlCommand) {
