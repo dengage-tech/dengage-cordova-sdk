@@ -51,6 +51,7 @@ public class DengageCR extends CordovaPlugin {
     Context context = null;
     DengageManager manager = null;
     InAppInlineHostView inlineHostView = null;
+    StoriesListHostView storyHostView = null;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -233,6 +234,20 @@ public class DengageCR extends CordovaPlugin {
                 payload = new JSONObject(args.getString(0));
             }
             this.showInAppInline(payload, callbackContext);
+            return true;
+        }
+
+        if (action.equals("showAppStory")) {
+            JSONObject payload = args.optJSONObject(0);
+            if (payload == null && args.length() > 0) {
+                payload = new JSONObject(args.getString(0));
+            }
+            this.showAppStory(payload, callbackContext);
+            return true;
+        }
+
+        if (action.equals("hideAppStory")) {
+            this.hideAppStory(callbackContext);
             return true;
         }
 
@@ -941,6 +956,84 @@ public class DengageCR extends CordovaPlugin {
                 root.removeView(inlineHostView);
             }
             inlineHostView = null;
+            callbackContext.success();
+        });
+    }
+
+    private void showAppStory(JSONObject payload, CallbackContext callbackContext) {
+        try {
+            if (payload == null) {
+                callbackContext.error("payload is required");
+                return;
+            }
+
+            String propertyId = payload.optString("propertyId", "").trim();
+            String screenName = payload.optString("screenName", "").trim();
+            JSONObject customParamsJson = payload.optJSONObject("customParams");
+            JSONObject boundsJson = payload.optJSONObject("bounds");
+
+            if (propertyId.isEmpty() || screenName.isEmpty()) {
+                callbackContext.error("propertyId and screenName are required");
+                return;
+            }
+
+            Activity activity = this.cordova.getActivity();
+            if (activity == null) {
+                callbackContext.error("Activity is null");
+                return;
+            }
+
+            final Map<String, String> customParams = toStringMap(customParamsJson);
+            final JSONObject bounds = boundsJson;
+            final CallbackContext hostCallback = callbackContext;
+            final String finalPropertyId = propertyId;
+            final String finalScreenName = screenName;
+
+            activity.runOnUiThread(() -> {
+                ViewGroup root = activity.findViewById(android.R.id.content);
+                if (root == null) {
+                    hostCallback.error("Root view is not available");
+                    return;
+                }
+
+                if (storyHostView != null) {
+                    ViewGroup parent = (ViewGroup) storyHostView.getParent();
+                    if (parent != null) {
+                        parent.removeView(storyHostView);
+                    }
+                    storyHostView = null;
+                }
+
+                StoriesListHostView hostView = new StoriesListHostView(activity);
+                FrameLayout.LayoutParams layoutParams = buildLayoutParams(bounds, activity);
+
+                root.addView(hostView, layoutParams);
+                hostView.bringToFront();
+                hostView.setTranslationZ(9999f);
+                ViewCompat.setElevation(hostView, 9999f);
+
+                hostView.showStories(finalPropertyId, finalScreenName, customParams, activity);
+                storyHostView = hostView;
+                hostCallback.success();
+            });
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void hideAppStory(CallbackContext callbackContext) {
+        Activity activity = this.cordova.getActivity();
+        if (activity == null) {
+            callbackContext.error("Activity is null");
+            return;
+        }
+
+        activity.runOnUiThread(() -> {
+            ViewGroup root = activity.findViewById(android.R.id.content);
+            if (root != null && storyHostView != null) {
+                root.removeView(storyHostView);
+            }
+            storyHostView = null;
             callbackContext.success();
         });
     }

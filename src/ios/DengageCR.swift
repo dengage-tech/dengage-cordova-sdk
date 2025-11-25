@@ -6,6 +6,7 @@ import Dengage
 public class DengageCR : CDVPlugin {
 
     private var inlineOverlayView: DengageInlineOverlayView?
+    private var appStoryOverlayView: DengageAppStoryOverlayView?
 
     @objc
     func promptForPushNotifications(_ command: CDVInvokedUrlCommand) {
@@ -694,6 +695,57 @@ public class DengageCR : CDVPlugin {
             guard let self = self else { return }
             self.inlineOverlayView?.removeFromSuperview()
             self.inlineOverlayView = nil
+            let result = CDVPluginResult(status: .ok)
+            self.commandDelegate.send(result, callbackId: command.callbackId)
+        }
+    }
+
+    @objc
+    func showAppStory(_ command: CDVInvokedUrlCommand) {
+        guard let payload = command.argument(at: 0) as? [String: Any] else {
+            let result = CDVPluginResult(status: .error, messageAs: "payload is required")
+            self.commandDelegate.send(result, callbackId: command.callbackId)
+            return
+        }
+
+        let propertyId = (payload["propertyId"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let screenName = (payload["screenName"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let boundsDict = payload["bounds"] as? [String: Any]
+        let customParams = stringDictionary(from: payload["customParams"])
+
+        guard !propertyId.isEmpty, !screenName.isEmpty else {
+            let result = CDVPluginResult(status: .error, messageAs: "propertyId and screenName are required")
+            self.commandDelegate.send(result, callbackId: command.callbackId)
+            return
+        }
+
+        let storyBounds = rectangle(from: boundsDict)
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard let container = self.webView?.superview ?? self.viewController?.view else {
+                let result = CDVPluginResult(status: .error, messageAs: "Unable to attach app story")
+                self.commandDelegate.send(result, callbackId: command.callbackId)
+                return
+            }
+
+            self.appStoryOverlayView?.removeFromSuperview()
+            let overlay = DengageAppStoryOverlayView()
+            overlay.configure(bounds: storyBounds, propertyId: propertyId, screenName: screenName, customParams: customParams)
+            container.addSubview(overlay)
+            self.appStoryOverlayView = overlay
+
+            let successResult = CDVPluginResult(status: .ok)
+            self.commandDelegate.send(successResult, callbackId: command.callbackId)
+        }
+    }
+
+    @objc
+    func hideAppStory(_ command: CDVInvokedUrlCommand) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.appStoryOverlayView?.removeFromSuperview()
+            self.appStoryOverlayView = nil
             let result = CDVPluginResult(status: .ok)
             self.commandDelegate.send(result, callbackId: command.callbackId)
         }

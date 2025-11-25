@@ -112,6 +112,12 @@ var DengageCR = {
     hideInAppInline: function (success, error) {
         exec(success, error, 'DengageCR', 'hideInAppInline', [])
     },
+    showAppStory: function (payload, success, error) {
+        exec(success, error, 'DengageCR', 'showAppStory', [payload])
+    },
+    hideAppStory: function (success, error) {
+        exec(success, error, 'DengageCR', 'hideAppStory', [])
+    },
     setPartnerDeviceId: function (adid,  success, error) {
         exec(success, error, 'DengageCR', 'setPartnerDeviceId', [adid])
     },
