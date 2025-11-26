@@ -59,8 +59,8 @@ public class DengageCRCoordinator {
                     null, 
                     disableOpenWebUrl != null ? disableOpenWebUrl : false,
                     NotificationDisplayPriorityConfiguration.SHOW_WITH_HIGH_PRIORITY,
-                    null, 
-                    false 
+                    null,
+                    enableGeoFence != null ? enableGeoFence : false
             );
         } catch (Exception e) {
             // Fallback: Try Kotlin-style init if available
@@ -69,12 +69,11 @@ public class DengageCRCoordinator {
         }
         
         Dengage.INSTANCE.setLogStatus(logEnabled != null ? logEnabled : false);
-        
+        Dengage.INSTANCE.restartApplicationAfterPushClick(disableOpenWebUrl != null ? !disableOpenWebUrl : false);
         if (developmentStatus != null) {
             Dengage.INSTANCE.setDevelopmentStatus(developmentStatus);
         }
         
-        Dengage.INSTANCE.inAppLinkConfiguration("www.chaitanyamunje.com");
         
         if (enableGeoFence != null && enableGeoFence) {
             try {

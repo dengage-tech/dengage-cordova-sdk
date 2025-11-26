@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
 import com.dengage.sdk.Dengage;
@@ -766,7 +767,7 @@ public class DengageCR extends CordovaPlugin {
             filter.addAction("com.dengage.push.intent.OPEN");
 
             NotifReciever notifReciever = new NotifReciever(callbackContext);
-            context.registerReceiver(notifReciever, filter);
+            ContextCompat.registerReceiver(context, notifReciever, filter, ContextCompat.RECEIVER_EXPORTED);
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }
@@ -1106,7 +1107,7 @@ public class DengageCR extends CordovaPlugin {
             filter.addAction("com.dengage.inapp.LINK_RETRIEVAL");
 
             InAppReceiver inAppReceiver = new InAppReceiver(callbackContext);
-            context.registerReceiver(inAppReceiver, filter);
+            ContextCompat.registerReceiver(context, inAppReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }
@@ -1588,9 +1589,9 @@ class NotifReciever extends NotificationReceiver {
                         jsonObject.addProperty("eventType", "PUSH_RECEIVE");
 
 
-                        PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
-                        result.setKeepCallback(true);
-                        notifyCallbackContext.sendPluginResult(result);
+                        //PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
+                        //result.setKeepCallback(true);
+                        //notifyCallbackContext.sendPluginResult(result);
                     }
                     break;
                 case -520704162:
