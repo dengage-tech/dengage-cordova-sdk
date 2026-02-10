@@ -47,6 +47,9 @@ public class DengageCRCoordinator {
         // Since Kotlin init has default parameters, we'll use a workaround
         try {
             // Try to call init using reflection or use the Kotlin-style init
+            if(deviceConfigurationPreference==null) {
+                deviceConfigurationPreference = DeviceConfigurationPreference.Google;
+            }
             com.dengage.sdk.Dengage.INSTANCE.init(
                     context,
                     firebaseIntegrationKey,
