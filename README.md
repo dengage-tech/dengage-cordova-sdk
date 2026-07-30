@@ -20,7 +20,7 @@ This guide analyzes the entire plugin, its native bindings, and the sample `deng
 | --- | --- |
 | Cordova plugin (`cordova-plugin-dengage`) | `1.0.27` |
 | Android Dengage SDK | `6.0.95` |
-| iOS Dengage SDK (CocoaPods) | `~> 5.101` |
+| iOS Dengage SDK (CocoaPods) | git branch `version/5.100` |
 
 The Android native SDK version is controlled by the `ANDROID_DENGAGE_SDK` preference in `plugin.xml` (default `6.0.95`). Override it in your app's `config.xml` if needed:
 
@@ -28,7 +28,13 @@ The Android native SDK version is controlled by the `ANDROID_DENGAGE_SDK` prefer
 <preference name="ANDROID_DENGAGE_SDK" value="6.0.95" />
 ```
 
-The iOS native SDK version is declared in `plugin.xml` as `pod 'Dengage', '~> 5.101'`. After changing it, run `pod install` inside `platforms/ios`.
+The iOS native SDK is declared in `plugin.xml` as:
+
+```ruby
+pod 'Dengage', :git => 'https://github.com/dengage-tech/dengage-ios-sdk.git', :branch => 'version/5.100'
+```
+
+After changing it, run `pod install` inside `platforms/ios`. When `INSTALL_DENGAGE_GEOFENCE=true`, the prepare hook injects `DengageGeofence` from the same git branch.
 
 ### Geofence dependency (opt-in, default off)
 
@@ -194,7 +200,7 @@ The plugin pulls in `com.github.dengage-tech.dengage-android-sdk:sdk:6.0.95` by 
 ## 6. iOS integration (native steps)
 
 1. **CocoaPods**
-   - Navigate to `platforms/ios` and run `pod install` so CocoaPods fetches the `Dengage` SDK specified in `plugin.xml` (`pod 'Dengage', '~> 5.101'`).
+   - Navigate to `platforms/ios` and run `pod install` so CocoaPods fetches the `Dengage` SDK specified in `plugin.xml` (git branch `version/5.100`).
 
 2. **Capabilities & entitlements**
    - In Xcode, enable **Push Notifications** and under **Background Modes** check **Remote notifications**.
