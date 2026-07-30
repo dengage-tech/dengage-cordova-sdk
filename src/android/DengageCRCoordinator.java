@@ -63,7 +63,7 @@ public class DengageCRCoordinator {
                     disableOpenWebUrl != null ? disableOpenWebUrl : false,
                     NotificationDisplayPriorityConfiguration.SHOW_WITH_HIGH_PRIORITY,
                     null,
-                    enableGeoFence != null ? enableGeoFence : false
+                    false // initForGeofence — RN leaves default; start via reflection below when enableGeoFence
             );
         } catch (Exception e) {
             // Fallback: Try Kotlin-style init if available
@@ -77,7 +77,7 @@ public class DengageCRCoordinator {
             Dengage.INSTANCE.setDevelopmentStatus(developmentStatus);
         }
         
-        
+        // Same as React Native: start geofence via reflection after init when flag is true
         if (enableGeoFence != null && enableGeoFence) {
             try {
                 Class<?> clazz = Class.forName("com.dengage.geofence.DengageGeofence");

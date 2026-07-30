@@ -9,6 +9,13 @@ allprojects {
 }
 
 dependencies {
-      implementation 'com.github.dengage-tech.dengage-android-sdk:sdk:6.0.92'
-        
+      def dengageSdkVersion = "6.0.95"
+      implementation "com.github.dengage-tech.dengage-android-sdk:sdk:${dengageSdkVersion}"
+
+      // Opt-in only (default false). Set in config.xml:
+      //   <preference name="INSTALL_DENGAGE_GEOFENCE" value="true" />
+      // after_prepare writes INSTALL_DENGAGE_GEOFENCE=true to gradle.properties
+      if (project.hasProperty('INSTALL_DENGAGE_GEOFENCE') && project.INSTALL_DENGAGE_GEOFENCE == 'true') {
+            implementation "com.github.dengage-tech.dengage-android-sdk:sdk-geofence:${dengageSdkVersion}"
+      }
 }

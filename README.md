@@ -14,6 +14,39 @@ This guide analyzes the entire plugin, its native bindings, and the sample `deng
 | `dengage-cordova-example/` | Opinionated working Cordova app showing how to initialize the SDK (`www/js/dengage-init.js`), hook navigation, and exercise every feature. |
 | `USAGE_GUIDE.md` | Quick-start snippets that you can copy into your app. |
 
+## 1.1 SDK versions
+
+| Component | Version |
+| --- | --- |
+| Cordova plugin (`cordova-plugin-dengage`) | `1.0.27` |
+| Android Dengage SDK | `6.0.95` |
+| iOS Dengage SDK (CocoaPods) | `~> 5.101` |
+
+The Android native SDK version is controlled by the `ANDROID_DENGAGE_SDK` preference in `plugin.xml` (default `6.0.95`). Override it in your app's `config.xml` if needed:
+
+```xml
+<preference name="ANDROID_DENGAGE_SDK" value="6.0.95" />
+```
+
+The iOS native SDK version is declared in `plugin.xml` as `pod 'Dengage', '~> 5.101'`. After changing it, run `pod install` inside `platforms/ios`.
+
+### Geofence dependency (opt-in, default off)
+
+`INSTALL_DENGAGE_GEOFENCE` defaults to **`false`** on **both Android and iOS**. The core Dengage SDK is always installed; the geofence module is not.
+
+To pull in geofence native libraries, set this in your app `config.xml`, then run `cordova prepare` (and on iOS `pod install`):
+
+```xml
+<preference name="INSTALL_DENGAGE_GEOFENCE" value="true" />
+```
+
+| Platform | What happens when `true` |
+| --- | --- |
+| **Android** | `after_prepare` writes `INSTALL_DENGAGE_GEOFENCE=true` into `platforms/android/gradle.properties`, and `build.gradle` adds `sdk-geofence`. |
+| **iOS** | `after_prepare` injects the `DengageGeofence` CocoaPod into `platforms/ios/Podfile`. |
+
+Also pass `enableGeoFence: true` to `setupDengage` (and call `requestLocationPermissions` / `startGeofence` as needed). Leaving the preference at `false` while setting `enableGeoFence: true` will no-op / log a warning because the geofence library is missing.
+
 ## 2. Getting ready
 
 - Install Cordova CLI: `npm install -g cordova`
@@ -97,6 +130,8 @@ Cordova merges these entries during `cordova prepare`, so you don’t edit the g
 
 ## 5. Android integration (native + Cordova)
 
+The plugin pulls in `com.github.dengage-tech.dengage-android-sdk:sdk:6.0.95` by default (see `src/android/build.gradle` and the `ANDROID_DENGAGE_SDK` preference in `plugin.xml`).
+
 1. **Manifest / Gradle prep**
    - Drop `google-services.json` into `platforms/android/app/`.
    - Apply the Firebase Gradle plugin:
@@ -139,7 +174,7 @@ Cordova merges these entries during `cordova prepare`, so you don’t edit the g
      * `Dengage.INSTANCE.init(…)` is invoked (falling back to Kotlin-style defaults).
      * Logging and `developmentStatus` are applied.
      * `inAppLinkConfiguration("www.chaitanyamunje.com")` is registered here, but you can override it via JS `setInAppLinkConfiguration`.
-     * If `enableGeoFence` is true, it tries to load `com.dengage.geofence.DengageGeofence.startGeofence()` via reflection (include `sdk-geofence` in Gradle for this to succeed).
+     * If `enableGeoFence` is true, it tries to load `com.dengage.geofence.DengageGeofence.startGeofence()` via reflection (requires `INSTALL_DENGAGE_GEOFENCE=true` so `sdk-geofence` is on the classpath).
 
 3. **In-app / stories host views**
    - `DengageCR.java` keeps singletons (`inlineHostView`, `storyHostView`). When JS calls `showInAppInline` or `showAppStory`, it:
@@ -149,7 +184,7 @@ Cordova merges these entries during `cordova prepare`, so you don’t edit the g
      * Each host view sets `hasRendered` so the same container is not re-used until `hideInAppInline` / `hideAppStory` removes it from the view hierarchy.
 
 4. **Geofence and permissions**
-   - Set `enableGeoFence` to `true` in `setupDengage` when you include `sdk-geofence`. The coordinator tries to load the class; if the JAR is missing, you will see a warning in Logcat.
+   - Geofence is **off by default**. First set `<preference name="INSTALL_DENGAGE_GEOFENCE" value="true" />` in `config.xml`, then set `enableGeoFence` to `true` in `setupDengage`. The coordinator loads `com.dengage.geofence.DengageGeofence.startGeofence()` via reflection; if the JAR is missing, you will see a warning in Logcat.
    - From JavaScript you can call `DengageCR.requestLocationPermissions(success, error)` to prompt Android 13+ runtime notification permission (and location if required).
 
 5. **Huawei (optional)**
@@ -159,7 +194,7 @@ Cordova merges these entries during `cordova prepare`, so you don’t edit the g
 ## 6. iOS integration (native steps)
 
 1. **CocoaPods**
-   - Navigate to `platforms/ios` and run `pod install` so CocoaPods fetches the `Dengage` SDK specified in `plugin.xml` (`pod 'Dengage', '~> 5.85'`).
+   - Navigate to `platforms/ios` and run `pod install` so CocoaPods fetches the `Dengage` SDK specified in `plugin.xml` (`pod 'Dengage', '~> 5.101'`).
 
 2. **Capabilities & entitlements**
    - In Xcode, enable **Push Notifications** and under **Background Modes** check **Remote notifications**.
@@ -173,7 +208,7 @@ Cordova merges these entries during `cordova prepare`, so you don’t edit the g
          launchOptions: launchOptions as NSDictionary?,
          application: application,
          askNotificationPermission: true,           // prompt user automatically
-         enableGeoFence: false,                     // enable if you include the geofence pod
+         enableGeoFence: false,                     // also set INSTALL_DENGAGE_GEOFENCE=true in config.xml
          disableOpenURL: false,
          badgeCountReset: true,
          logVisible: true
@@ -238,9 +273,10 @@ Cordova merges these entries during `cordova prepare`, so you don’t edit the g
 
 ### 7.6 Location & geofence
 
-- Include the optional geofence dependency (`sdk-geofence`) and pass `enableGeoFence: true` to `setupDengage`. The coordinator uses reflection to call `DengageGeofence.startGeofence()`.
-- `requestLocationPermissions()` pops up the run-time permission dialog (needed on Android 13+ when background location is required by geofence campaigns).
-- After permissions are granted, Dengage can trigger geofence campaigns purely from the native SDK; no extra JavaScript call is needed beyond enabling the module.
+- Geofence ships **disabled by default** (`INSTALL_DENGAGE_GEOFENCE=false` on Android and iOS). Opt in with `<preference name="INSTALL_DENGAGE_GEOFENCE" value="true" />` in `config.xml`, run `cordova prepare`, then pass `enableGeoFence: true` to `setupDengage`.
+- On Android the coordinator uses reflection to call `DengageGeofence.startGeofence()` when the `sdk-geofence` artifact is present. On iOS the same flag starts geofence when the `DengageGeofence` pod was injected.
+- `requestLocationPermissions()` pops up the run-time permission dialog (needed on Android 13+ when background location is required by geofence campaigns). You can also call `startGeofence` / `stopGeofence` from JS after permissions are granted.
+- After permissions are granted, Dengage can trigger geofence campaigns from the native SDK; no extra JavaScript is required beyond installing the module and enabling it at init (or via `startGeofence`).
 
 ### 7.7 Custom payload handling
 
@@ -794,9 +830,13 @@ The example `screens/inbox-messages.js` shows how to populate a list, delete ent
 
 ## 11. Geofence & location triggers
 
-- Include `sdk-geofence` (via Gradle or CocoaPods) and set the `enableGeoFence` flag to true while initializing.
-- The coordinator automatically tries to load `com.dengage.geofence.DengageGeofence.startGeofence()`.
-- Use `DengageCR.requestLocationPermissions` to satisfy the runtime permission request if your app triggers location-based campaigns.
+- **Default:** geofence is **not** installed (`INSTALL_DENGAGE_GEOFENCE` defaults to `false` on Android and iOS).
+- **Enable:**
+  1. Add `<preference name="INSTALL_DENGAGE_GEOFENCE" value="true" />` to `config.xml`.
+  2. Run `cordova prepare` (Android writes `gradle.properties`; iOS injects `DengageGeofence` into the Podfile). On iOS also run `pod install` under `platforms/ios`.
+  3. Pass `enableGeoFence: true` in `setupDengage` (and/or call `DengageCR.startGeofence` from JS).
+- The Android coordinator loads `com.dengage.geofence.DengageGeofence.startGeofence()` via reflection when the artifact is present.
+- Use `DengageCR.requestLocationPermissions` for the runtime permission prompt when your app uses location-based campaigns.
 
 ## 12. deeplinks & URLs
 

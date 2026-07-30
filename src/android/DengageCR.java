@@ -402,6 +402,90 @@ public class DengageCR extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("setDeviceId")) {
+            this.setDeviceId(args.getString(0), callbackContext);
+            return true;
+        }
+
+        if (action.equals("setLanguage")) {
+            this.setLanguage(args.getString(0), callbackContext);
+            return true;
+        }
+
+        if (action.equals("setDevelopmentStatus")) {
+            this.setDevelopmentStatus(args.getBoolean(0), callbackContext);
+            return true;
+        }
+
+        if (action.equals("getUserPermission")) {
+            this.getPermission(callbackContext);
+            return true;
+        }
+
+        if (action.equals("resetAppBadge")) {
+            this.resetAppBadge(callbackContext);
+            return true;
+        }
+
+        if (action.equals("promptForPushNotificationsWithCallback")) {
+            this.promptForPushNotificationsWithCallback(callbackContext);
+            return true;
+        }
+
+        if (action.equals("setTrackingPermission")) {
+            this.setTrackingPermission(args.getBoolean(0), callbackContext);
+            return true;
+        }
+
+        if (action.equals("getTrackingPermission")) {
+            this.getTrackingPermission(callbackContext);
+            return true;
+        }
+
+        if (action.equals("startGeofence")) {
+            this.startGeofence(callbackContext);
+            return true;
+        }
+
+        if (action.equals("stopGeofence")) {
+            this.stopGeofence(callbackContext);
+            return true;
+        }
+
+        if (action.equals("onMessageReceived")) {
+            JSONObject data = args.optJSONObject(0);
+            if (data == null && args.length() > 0) {
+                data = new JSONObject(args.getString(0));
+            }
+            this.onMessageReceived(data != null ? data : new JSONObject(), callbackContext);
+            return true;
+        }
+
+        if (action.equals("registerForRemoteNotifications")) {
+            boolean enable = args.length() > 0 && args.getBoolean(0);
+            this.registerForRemoteNotifications(enable, callbackContext);
+            return true;
+        }
+
+        if (action.equals("setIntegrationKey")) {
+            // iOS-only API; keep for parity
+            callbackContext.success();
+            return true;
+        }
+
+        if (action.equals("setFirebaseIntegrationKey")) {
+            // Key must be set during Dengage.init(); kept for API parity
+            Log.w("DengageCR", "setFirebaseIntegrationKey called. Firebase key should be set during Dengage.init()");
+            callbackContext.success();
+            return true;
+        }
+
+        if (action.equals("handleNotificationActionBlock")) {
+            // Covered by registerNotification on Android; keep callback for parity
+            this.registerNotification(callbackContext);
+            return true;
+        }
+
         return false;
     }
 
@@ -1549,17 +1633,141 @@ public class DengageCR extends CordovaPlugin {
     private void requestLocationPermissions(CallbackContext callbackContext) {
         try {
             android.app.Activity activity = this.cordova.getActivity();
-            if (activity != null) {
-                Class<?> clazz = Class.forName("com.dengage.geofence.DengageGeofence");
-                Object instance = clazz.getField("INSTANCE").get(null);
-                java.lang.reflect.Method method = clazz.getMethod("requestLocationPermissions", android.app.Activity.class);
-                method.invoke(instance, activity);
-                callbackContext.success();
-            } else {
+            if (activity == null) {
                 callbackContext.error("Activity is null");
+                return;
             }
+            Class<?> clazz = Class.forName("com.dengage.geofence.DengageGeofence");
+            Object instance = clazz.getField("INSTANCE").get(null);
+            clazz.getMethod("requestLocationPermissions", android.app.Activity.class).invoke(instance, activity);
+            callbackContext.success();
         } catch (ClassNotFoundException e) {
-            callbackContext.error("DengageGeofence library could not be found");
+            Log.w("DengageCR", "DengageGeofence library could not be found");
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setDeviceId(String deviceId, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setDeviceId(deviceId);
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setLanguage(String language, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setLanguage(language);
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setDevelopmentStatus(boolean isDebug, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setDevelopmentStatus(isDebug);
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void resetAppBadge(CallbackContext callbackContext) {
+        try {
+            android.app.NotificationManager notificationManager =
+                    (android.app.NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.cancelAll();
+            }
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void promptForPushNotificationsWithCallback(CallbackContext callbackContext) {
+        try {
+            android.app.Activity activity = this.cordova.getActivity();
+            if (activity != null) {
+                Dengage.INSTANCE.requestNotificationPermission(activity);
+            }
+            boolean permission = Dengage.INSTANCE.getSubscription() != null
+                    && Boolean.TRUE.equals(Dengage.INSTANCE.getSubscription().getPermission());
+            callbackContext.success(permission ? 1 : 0);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setTrackingPermission(boolean permission, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setTrackingPermission(permission);
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void getTrackingPermission(CallbackContext callbackContext) {
+        try {
+            callbackContext.success(Dengage.INSTANCE.getTrackingPermission() ? 1 : 0);
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void startGeofence(CallbackContext callbackContext) {
+        try {
+            Class<?> clazz = Class.forName("com.dengage.geofence.DengageGeofence");
+            Object instance = clazz.getField("INSTANCE").get(null);
+            clazz.getMethod("startGeofence").invoke(instance);
+            callbackContext.success();
+        } catch (ClassNotFoundException e) {
+            Log.w("DengageCR", "DengageGeofence library could not be found");
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void stopGeofence(CallbackContext callbackContext) {
+        try {
+            Class<?> clazz = Class.forName("com.dengage.geofence.DengageGeofence");
+            Object instance = clazz.getField("INSTANCE").get(null);
+            clazz.getMethod("stopGeofence").invoke(instance);
+            callbackContext.success();
+        } catch (ClassNotFoundException e) {
+            Log.w("DengageCR", "DengageGeofence library could not be found");
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void onMessageReceived(JSONObject data, CallbackContext callbackContext) {
+        try {
+            Map<String, String> stringMap = new HashMap<>();
+            Iterator<String> keys = data.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = data.opt(key);
+                stringMap.put(key, value != null ? String.valueOf(value) : "");
+            }
+            Dengage.INSTANCE.onMessageReceived(stringMap);
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void registerForRemoteNotifications(boolean enable, CallbackContext callbackContext) {
+        try {
+            Dengage.INSTANCE.setUserPermission(enable);
+            callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(e.getMessage());
         }

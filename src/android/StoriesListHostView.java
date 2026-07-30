@@ -31,7 +31,7 @@ public class StoriesListHostView extends FrameLayout {
         }
 
         final HashMap<String, String> paramsCopy = customParams != null ? new HashMap<>(customParams) : null;
-        Dengage.INSTANCE.showStoriesList(propertyId, storiesListView, activity, paramsCopy, screenName);
+        Dengage.INSTANCE.showStoriesList(propertyId, storiesListView, activity, paramsCopy, screenName, false);
         hasRendered = true;
     }
 }

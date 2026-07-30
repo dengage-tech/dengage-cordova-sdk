@@ -85,9 +85,6 @@ var DengageCR = {
     setNavigationWithName: function (screenName, success, error) {
         exec(success, error, 'DengageCR', 'setNavigationWithName', [screenName])
     },
-    setNavigationWithNameAndData: function (screenName, screenData, success, error) {
-        exec(success, error, 'DengageCR', 'setNavigationWithNameAndData', [screenName, screenData])
-    },
     setCategoryPath: function (path,  success, error) {
         exec(success, error, 'DengageCR', 'setCategoryPath', [path])
     },
@@ -199,13 +196,49 @@ var DengageCR = {
     getUserPermission: function (success, error) {
         exec(success, error, 'DengageCR', 'getUserPermission', [])
     },
+
+    setUserPermission: function (permission, success, error) {
+        exec(success, error, 'DengageCR', 'setUserPermission', [permission])
+    },
     
     resetAppBadge: function (success, error) {
         exec(success, error, 'DengageCR', 'resetAppBadge', [])
     },
-    
-    setNavigationWithNameAndData: function (screenName, screenData, success, error) {
-        exec(success, error, 'DengageCR', 'setNavigationWithNameAndData', [screenName, screenData])
+
+    setTrackingPermission: function (permission, success, error) {
+        exec(success, error, 'DengageCR', 'setTrackingPermission', [permission])
+    },
+
+    getTrackingPermission: function (success, error) {
+        exec(success, error, 'DengageCR', 'getTrackingPermission', [])
+    },
+
+    startGeofence: function (success, error) {
+        exec(success, error, 'DengageCR', 'startGeofence', [])
+    },
+
+    stopGeofence: function (success, error) {
+        exec(success, error, 'DengageCR', 'stopGeofence', [])
+    },
+
+    onMessageReceived: function (data, success, error) {
+        exec(success, error, 'DengageCR', 'onMessageReceived', [data])
+    },
+
+    registerForRemoteNotifications: function (enable, success, error) {
+        exec(success, error, 'DengageCR', 'registerForRemoteNotifications', [enable])
+    },
+
+    setIntegrationKey: function (key, success, error) {
+        exec(success, error, 'DengageCR', 'setIntegrationKey', [key])
+    },
+
+    setFirebaseIntegrationKey: function (key, success, error) {
+        exec(success, error, 'DengageCR', 'setFirebaseIntegrationKey', [key])
+    },
+
+    handleNotificationActionBlock: function (success, error) {
+        exec(success, error, 'DengageCR', 'handleNotificationActionBlock', [])
     },
     
 };

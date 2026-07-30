@@ -1,6 +1,9 @@
 import UIKit
 import Foundation
 import Dengage
+#if canImport(DengageGeofence)
+import DengageGeofence
+#endif
 
 @objc(DengageCR)
 public class DengageCR : CDVPlugin {
@@ -449,7 +452,9 @@ public class DengageCR : CDVPlugin {
             notification["request"] = notificationReq
             response["notification"] = notification
 
-            self.commandDelegate.send(CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: response), callbackId: command.callbackId)
+            let pluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: response)
+            pluginResult?.setKeepCallbackAs(true)
+            self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
 
         }
     }
@@ -1077,12 +1082,9 @@ public class DengageCR : CDVPlugin {
     func requestLocationPermissions (_ command: CDVInvokedUrlCommand) -> Void {
 #if canImport(DengageGeofence)
         DengageGeofence.requestLocationPermissions()
+#endif
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
-#else
-        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_ERROR, messageAs: "DengageGeofence library not available")
-        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
-#endif
     }
 
     @objc
@@ -1107,12 +1109,60 @@ public class DengageCR : CDVPlugin {
     }
 
     @objc
-    func setNavigationWithNameAndData (_ command: CDVInvokedUrlCommand) -> Void {
-        let screenName: String = command.argument(at: 0) as! String
-        let screenData: NSDictionary = command.argument(at: 1) as! NSDictionary
-        
-        Dengage.showRealTimeInApp(screenName: screenName, params: screenData as? Dictionary<String, String>)
-        
+    func getUserPermission (_ command: CDVInvokedUrlCommand) -> Void {
+        getPermission(command)
+    }
+
+    @objc
+    func setUserPermission (_ command: CDVInvokedUrlCommand) -> Void {
+        setPermission(command)
+    }
+
+    @objc
+    func setTrackingPermission (_ command: CDVInvokedUrlCommand) -> Void {
+        let permission: Bool = command.argument(at: 0) as? Bool ?? false
+        Dengage.setTrackingPermission(trackingPermission: permission)
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func getTrackingPermission (_ command: CDVInvokedUrlCommand) -> Void {
+        let permission = DengageLocalStorage.shared.value(for: .trackingPermission) as? Bool ?? true
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK, messageAs: permission)
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func startGeofence (_ command: CDVInvokedUrlCommand) -> Void {
+#if canImport(DengageGeofence)
+        DengageGeofence.startGeofence()
+#endif
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func stopGeofence (_ command: CDVInvokedUrlCommand) -> Void {
+#if canImport(DengageGeofence)
+        DengageGeofence.stopGeofence()
+#endif
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func registerForRemoteNotifications (_ command: CDVInvokedUrlCommand) -> Void {
+        let enable: Bool = command.argument(at: 0) as? Bool ?? true
+        Dengage.set(permission: enable)
+        let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
+        self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
+    }
+
+    @objc
+    func setIntegrationKey (_ command: CDVInvokedUrlCommand) -> Void {
+        let key: String = command.argument(at: 0) as? String ?? ""
+        Dengage.setIntegrationKey(key: key)
         let pluginResult:CDVPluginResult = CDVPluginResult.init(status: CDVCommandStatus_OK)
         self.commandDelegate.send(pluginResult, callbackId: command.callbackId)
     }
